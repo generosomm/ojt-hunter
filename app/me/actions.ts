@@ -85,6 +85,29 @@ export async function saveRoleToTracker(opportunityId: string): Promise<Result> 
   return { ok: true };
 }
 
+// "I applied" from a role page: adds the role as applied today, or moves a saved row to applied.
+// A row already past applied (interview, offer...) is left alone.
+export async function markRoleApplied(opportunityId: string): Promise<Result> {
+  const { supabase, userId } = await currentUser();
+  if (!userId) return { ok: false, error: "Sign in to track roles." };
+  const applied_on = todayIn((await getConfig()).timezone);
+  const { data: row, error: readError } = await supabase
+    .from("applications")
+    .select("id, status")
+    .eq("user_id", userId)
+    .eq("opportunity_id", opportunityId)
+    .maybeSingle();
+  if (readError) return { ok: false, error: readError.message };
+  const { error } = row
+    ? row.status === "saved"
+      ? await supabase.from("applications").update({ status: "applied", applied_on }).eq("id", row.id)
+      : { error: null }
+    : await supabase.from("applications").insert({ user_id: userId, opportunity_id: opportunityId, status: "applied", applied_on });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true };
+}
+
 export async function setChecklistStatus(itemKey: string, status: string): Promise<Result> {
   const { supabase, userId } = await currentUser();
   if (!userId) return { ok: false, error: NOT_SIGNED_IN };

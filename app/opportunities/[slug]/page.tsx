@@ -9,7 +9,7 @@ import { AdminRoleEditor } from "@/components/admin-role-editor";
 import { PublishToggle } from "@/components/publish-toggle";
 import { SaveRoleButton } from "@/components/save-role-button";
 import { StillOpen } from "@/components/still-open";
-import { getSavedOpportunityIds } from "@/lib/me";
+import { getTrackedStatuses } from "@/lib/me";
 import { getConfig, getJobBoards, getOpportunity, getViewer } from "@/lib/data";
 import { allowanceHeadline, boardSearchUrl, boardSearchWords, checkedAgo, postedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
 import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
@@ -49,7 +49,7 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
   const { slug } = await params;
   const [data, config, boards] = await Promise.all([getOpportunity(slug), getConfig(), getJobBoards()]);
   if (!data) notFound();
-  const [viewer, saved] = await Promise.all([getViewer(config), getSavedOpportunityIds()]);
+  const [viewer, tracked] = await Promise.all([getViewer(config), getTrackedStatuses()]);
   const { opp, facts, checks } = data;
   const pay = allowanceHeadline(opp);
   const hours = hoursText(opp.required_hours_min, opp.required_hours_max);
@@ -105,7 +105,7 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
               <ArrowUpRight className="size-4" />
             </a>
           )}
-          <SaveRoleButton opportunityId={opp.id} saved={saved.has(opp.id)} signedIn={Boolean(viewer.userId)} />
+          <SaveRoleButton opportunityId={opp.id} status={tracked.get(opp.id) ?? null} signedIn={Boolean(viewer.userId)} />
           <Link
             href={`/templates?t=${opp.partnership_status === "not_listed" ? "moa_question" : "application"}&role=${opp.slug}`}
             className="glass flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium"

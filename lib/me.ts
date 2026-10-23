@@ -91,13 +91,6 @@ export async function getChecklist(): Promise<ChecklistItem[]> {
   return rows.sort((a, b) => (a.template?.sort_order ?? 0) - (b.template?.sort_order ?? 0));
 }
 
-export async function getSavedOpportunityIds(): Promise<Set<string>> {
-  const { supabase, userId } = await currentUser();
-  if (!userId) return new Set();
-  const { data } = await supabase.from("applications").select("opportunity_id").not("opportunity_id", "is", null);
-  return new Set((data ?? []).map((r) => r.opportunity_id as string));
-}
-
 // role id -> tracker status, so directory cards can show "Saved" or "Applied" without opening the role
 async function loadTrackedStatuses(): Promise<Map<string, ApplicationStatus>> {
   const { supabase, userId } = await currentUser();
