@@ -8,3 +8,4 @@
 | Owner data | 40 rows (19 applied, 16 saved, 1 interview, 1 offered, 2 declined, 1 closed); profile 600/800 | passed 2026-10-23 |
 | Build | `npm run build`, `tsc`, `lint` | passed 2026-10-23 |
 | Signed-in flow on a phone | Change a status, add a follow-up, add a company, tick a checklist item, save profile with a bad URL (error stays, input kept) | pending (owner) |
+| Desktop board not cropped | At 1874x954 with 16 Saved cards: board 602px tall ends at 808px (dock at 880), page has no scroll, Saved scrolls inside, sideways scrollbar in view; padding keeps focus rings unclipped. Root cause: 7 columns need ~2090px in 1120px, and the sideways scrollbar sat below a 16-card column | passed 2026-10-23 (layout reproduction with the same classes; owner reported the bug) |

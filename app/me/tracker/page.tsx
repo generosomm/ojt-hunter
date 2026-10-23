@@ -50,18 +50,26 @@ async function Tracker() {
           </p>
         </div>
       ) : (
-        // phone: stacked groups (empty ones hidden). desktop: kanban columns that scroll sideways
-        <div className="flex flex-col gap-5 lg:flex-row lg:gap-3 lg:overflow-x-auto lg:pb-3">
+        // phone: stacked groups (empty ones hidden).
+        // desktop: the board is one screen tall and ends above the dock, each column scrolls on its own,
+        // so the sideways scrollbar stays in view instead of sitting under a long column. Padding keeps focus rings unclipped.
+        <div className="flex flex-col gap-5 lg:h-[max(28rem,calc(100dvh-22rem))] lg:snap-x lg:flex-row lg:gap-3 lg:overflow-x-auto lg:p-1 lg:pb-3">
           {columns.map((col) => (
-            <section key={col.key} aria-label={col.title} className={`flex shrink-0 flex-col gap-2.5 lg:w-72 ${col.items.length === 0 ? "hidden lg:flex" : ""}`}>
+            <section
+              key={col.key}
+              aria-label={col.title}
+              className={`flex shrink-0 flex-col gap-2.5 lg:min-h-0 lg:w-72 lg:snap-start ${col.items.length === 0 ? "hidden lg:flex" : ""}`}
+            >
               <h2 className="flex items-center gap-2 px-1 text-sm font-semibold">
                 {col.title}
                 <span className="tabular rounded-full bg-ink/8 px-2 text-xs text-ink-soft">{col.items.length}</span>
               </h2>
-              {col.items.map((a) => (
-                <TrackerCard key={a.id} app={a} today={today} />
-              ))}
-              {col.items.length === 0 && <div className="hidden h-20 rounded-[20px] border border-dashed border-ink/15 lg:block" />}
+              <div className="flex flex-col gap-2.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:p-1">
+                {col.items.map((a) => (
+                  <TrackerCard key={a.id} app={a} today={today} />
+                ))}
+                {col.items.length === 0 && <div className="hidden h-20 shrink-0 rounded-[20px] border border-dashed border-ink/15 lg:block" />}
+              </div>
             </section>
           ))}
         </div>
