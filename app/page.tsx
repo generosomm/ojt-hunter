@@ -10,9 +10,20 @@ import { cityOptions, parseFilters } from "@/lib/filters";
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-28">
-      <Suspense fallback={<HeroSkeleton />}>
-        <Hero />
-      </Suspense>
+      {/* the headline is static; only the card's numbers wait for the database, in a same-size placeholder (no layout shift) */}
+      <section className="grid items-center gap-8 pb-10 pt-8 sm:grid-cols-[1fr_auto] sm:pt-14">
+        <div>
+          <h1 className="text-5xl font-semibold leading-[1.02] tracking-[-0.03em] sm:text-7xl">
+            Find your
+            <br />
+            OJT.
+          </h1>
+          <p className="mt-4 max-w-sm text-ink-soft">Real pay, HTE status and where to apply.</p>
+        </div>
+        <Suspense fallback={<CardSkeleton />}>
+          <HeroCard />
+        </Suspense>
+      </section>
       <Suspense fallback={<ListSkeleton />}>
         <Directory searchParams={searchParams} />
       </Suspense>
@@ -24,22 +35,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
   );
 }
 
-async function Hero() {
+async function HeroCard() {
   await connection();
   const [config, stats] = await Promise.all([getConfig(), getDirectoryStats()]);
-  return (
-    <section className="grid items-center gap-8 pb-10 pt-8 sm:grid-cols-[1fr_auto] sm:pt-14">
-      <div>
-        <h1 className="text-5xl font-semibold leading-[1.02] tracking-[-0.03em] sm:text-7xl">
-          Find your
-          <br />
-          OJT.
-        </h1>
-        <p className="mt-4 max-w-sm text-ink-soft">Real pay, HTE status and where to apply.</p>
-      </div>
-      <IdCardHero live={stats.live} partners={stats.partners} campus={config.campus} />
-    </section>
-  );
+  return <IdCardHero live={stats.live} partners={stats.partners} campus={config.campus} />;
 }
 
 async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
@@ -73,8 +72,14 @@ async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">)
   );
 }
 
-function HeroSkeleton() {
-  return <div className="h-[340px] sm:h-[320px]" />;
+// same box as IdCardHero: 40px lanyard + a 1.58:1 card, 340px wide at most
+function CardSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-[340px] sm:w-[340px]">
+      <div className="h-10" />
+      <div className="glass-strong aspect-[1.58/1] w-full animate-pulse rounded-[26px]" />
+    </div>
+  );
 }
 
 function ListSkeleton() {
