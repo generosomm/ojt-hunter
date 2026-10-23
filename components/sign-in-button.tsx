@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function SignInButton() {
+export function SignInButton({ compact = false }: { compact?: boolean }) {
   const [loading, setLoading] = useState(false);
 
   async function signIn() {
@@ -21,9 +21,13 @@ export function SignInButton() {
       type="button"
       onClick={signIn}
       disabled={loading}
-      className="min-h-11 rounded-full bg-foreground px-5 font-medium text-background disabled:opacity-60"
+      className={
+        compact
+          ? "h-9 rounded-full bg-nu-blue px-4 text-sm font-medium text-white disabled:opacity-60"
+          : "min-h-11 rounded-full bg-nu-blue px-5 font-medium text-white disabled:opacity-60"
+      }
     >
-      {loading ? "Opening Google..." : "Sign in with Google"}
+      {loading ? "Opening Google..." : compact ? "Sign in" : "Sign in with Google"}
     </button>
   );
 }

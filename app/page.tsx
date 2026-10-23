@@ -1,61 +1,83 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
-import { SignInButton } from "@/components/sign-in-button";
-import { createClient } from "@/lib/supabase/server";
+import { connection } from "next/server";
+import { IdCardHero } from "@/components/id-card-hero";
+import { DirectoryFilters } from "@/components/filters";
+import { OpportunityCard } from "@/components/opportunity-card";
+import { getConfig, getDirectoryStats, getListings, getViewer } from "@/lib/data";
+import { cityOptions, parseFilters } from "@/lib/filters";
 
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-4 py-16">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">OJT Hunter</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Setup check. The directory is coming soon.
-        </p>
-      </div>
-
-      {/* The session is read per request, so it streams in after the static shell. */}
-      <Suspense fallback={<p className="min-h-11 text-zinc-500">Checking sign-in...</p>}>
-        <AuthStatus searchParams={searchParams} />
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24">
+      <Suspense fallback={<HeroSkeleton />}>
+        <Hero />
+      </Suspense>
+      <Suspense fallback={<ListSkeleton />}>
+        <Directory searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function AuthStatus({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
-  // Supabase checks token expiry with Date.now(), so render this only at request time.
+async function Hero() {
   await connection();
-  const { auth_error } = await searchParams;
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const email = data?.claims?.email as string | undefined;
+  const [config, stats] = await Promise.all([getConfig(), getDirectoryStats()]);
+  return (
+    <section className="grid items-center gap-8 pb-10 pt-8 sm:grid-cols-[1fr_auto] sm:pt-14">
+      <div>
+        <h1 className="text-5xl font-semibold leading-[1.02] tracking-[-0.03em] sm:text-7xl">
+          Find your
+          <br />
+          OJT.
+        </h1>
+        <p className="mt-4 max-w-sm text-ink-soft">Real pay, HTE status and where to apply.</p>
+      </div>
+      <IdCardHero live={stats.live} partners={stats.partners} campus={config.campus} />
+    </section>
+  );
+}
+
+async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
+  await connection();
+  const filters = parseFilters(await searchParams);
+  const config = await getConfig();
+  const viewer = await getViewer(config);
+  const [items, stats] = await Promise.all([getListings(filters, viewer), getDirectoryStats()]);
 
   return (
-    <>
-      {auth_error && (
-        <p role="alert" className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
-          Sign-in did not finish. Try again.
+    <section aria-label="OJT openings" className="grid gap-5 lg:grid-cols-[300px_1fr] lg:gap-6">
+      <DirectoryFilters initial={filters} cities={cityOptions(stats.cities)} requiredHours={viewer.requiredHours} maxHours={viewer.maxHours} />
+      <div className="flex flex-col gap-3 lg:col-start-2">
+        <p className="px-1 text-sm text-ink-soft" aria-live="polite">
+          {items.length} {items.length === 1 ? "role" : "roles"}
         </p>
-      )}
+        {items.length === 0 ? (
+          <div className="glass rounded-[22px] p-8 text-center">
+            <p className="font-medium">Nothing matches yet.</p>
+            <p className="mt-1 text-sm text-ink-soft">Remove a filter, or check back after new roles are reviewed.</p>
+          </div>
+        ) : (
+          <div className="grid gap-3 xl:grid-cols-2">
+            {items.map((item) => (
+              <OpportunityCard key={item.id} item={item} timeZone={config.timezone} requiredHours={viewer.requiredHours} maxHours={viewer.maxHours} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
 
-      {email ? (
-        <div className="flex flex-col gap-4">
-          <p>
-            Signed in as <span className="font-medium">{email}</span>
-          </p>
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="min-h-11 rounded-full border border-zinc-300 px-5 font-medium dark:border-zinc-700"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-      ) : (
-        <div>
-          <SignInButton />
-        </div>
-      )}
-    </>
+function HeroSkeleton() {
+  return <div className="h-[340px] sm:h-[320px]" />;
+}
+
+function ListSkeleton() {
+  return (
+    <div className="grid gap-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="glass h-40 animate-pulse rounded-[22px]" />
+      ))}
+    </div>
   );
 }

@@ -7,8 +7,8 @@ Phases 2 and 3 are already public and shareable once deployed.
 | ID | Outcome | Acceptance summary | Depends | Status | Record / tests |
 |---|---|---|---|---|---|
 | P0 | Setup: empty Next.js 16 app live on Vercel, Supabase + Google auth wired | Live URL loads; Google sign-in round trip works; no secrets in repo | none | Done | [P0](sprints/P0.md) / [tests](../tests/sprints/P0/README.md) |
-| P1 | Database: all tables, enums, RLS, indexes, per-day allowance estimate, curated seed (unpublished) | Migrations apply clean; RLS denies cross-user reads; seed counts match the merge rule; no `fit_note` in repo | P0 | In progress | [P1](sprints/P1.md) / [tests](../tests/sprints/P1/README.md) |
-| P2 | Directory + filters + company/opportunity pages (public) | Filters in URL; "not disclosed" handled; remote hidden by default; works at 375px | P1 | Planned | |
+| P1 | Database: all tables, enums, RLS, indexes, per-day allowance estimate, curated seed (unpublished) | Migrations apply clean; RLS denies cross-user reads; seed counts match the merge rule; no `fit_note` in repo | P0 | Done | [P1](sprints/P1.md) / [tests](../tests/sprints/P1/README.md) |
+| P2 | Directory + filters + company/opportunity pages (public) | Filters in URL; "not disclosed" handled; remote hidden by default; works at 375px | P1 | Implemented | [P2](sprints/P2.md) / [tests](../tests/sprints/P2/README.md) |
 | P3 | Partnership checker + MOA board + cold-email list | Alias/fuzzy match; careful "not found" wording; bounced shown only as "do not use" | P1 | Planned | |
 | P4 | Auth + profile + private tracker + deployment checklist | Owner-only access by RLS; follow-ups due today highlighted; checklist "can do now" filter | P1 | Planned | |
 | P5 | Templates page | Fills from profile only; subject/body copy; pre-send checklist; no em dashes | P4 | Planned | |
@@ -23,6 +23,5 @@ Phases 2 and 3 are already public and shareable once deployed.
   `OJT Hunter Website\` is older and missing the contacts table, bounces and the NU Manila point.
 
 ## Current handoff
-P1 schema and access rules are applied and tested. Seed is generated; waiting for the owner to run
-`supabase/seed.sql` once in the Supabase SQL Editor, then verify counts. Open P0 item: a classmate
-confirms sign-in.
+P2 is built and deployed. All 44 roles are drafts: the owner signs in on the live site, reviews them
+(admins see drafts) and publishes. Then real-phone check and P3. Open P0 item: a classmate confirms sign-in.

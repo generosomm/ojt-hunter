@@ -12,6 +12,17 @@ Status: **owner brief set 2026-10-23; tokens and components defined at the start
   primitives, Sonner toasts, Motion for transitions), restyled to the project tokens.
 - Nothing hardcoded: every listing, label list and number comes from the database or `app_config`.
 
+## Tokens (P2, in `app/globals.css`)
+- Colors: ink `#141a46` (NU navy text), wall `#e9edf8`, NU blue `#35408e` (actions), NU gold `#f2c230`
+  (accent, used once per screen), status good/warn/bad/muted. Dark mode swaps to a `#0c1030` wall.
+- Glass: `glass` (cards, bars) and `glass-strong` (hero card, sheets): translucent white, 22-28px blur,
+  1px light edge. Sits on a still wallpaper of three soft radial fields. No animated backgrounds.
+- Type: Onest only. Big tabular numbers for pay; sentence case everywhere; no all-caps labels.
+- Radius by hierarchy: sheets and hero 26-28px, cards 22px, inputs 16px, chips and buttons full pill.
+- Signature: the tilting glass intern ID card on the home hero (Motion springs, off with reduced motion).
+  It renders visible in the server HTML; the entrance only moves it, never fades it in.
+- Components: Lucide icons, Vaul bottom sheet for mobile filters, Sonner toasts, Motion for the tilt.
+
 ## Fixed constraints (from spec section 8)
 - Mobile first, 375px phones opened from Messenger. Compact cards; sticky filter button that opens a
   bottom sheet on mobile, sidebar filters on desktop.

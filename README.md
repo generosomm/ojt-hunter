@@ -3,7 +3,7 @@
 A shared OJT hunting dashboard for NU Laguna students: allowance, HTE partnership status, setup,
 hours, intake, open status and how to apply, in one place. Plus a private tracker and email templates.
 
-Status: **Phase 0 done, Phase 1 next.** Live URL: https://ojthunter.vercel.app
+Status: **P2 (directory) built; P3 next.** Live URL: https://ojthunter.vercel.app
 
 ## Run locally
 1. Copy `.env.example` to `.env.local` and fill in the Supabase URL and publishable key.
