@@ -6,8 +6,8 @@ before Phase 7 lands. Phases 2 and 3 are already public and shareable once deplo
 
 | ID | Outcome | Acceptance summary | Depends | Status | Record / tests |
 |---|---|---|---|---|---|
-| P0 | Setup: empty Next.js 16 app live on Vercel, Supabase + Google auth wired | Live URL loads; Google sign-in round trip works; no secrets in repo | none | In progress | [P0](sprints/P0.md) / [tests](../tests/sprints/P0/README.md) |
-| P1 | Database: all tables, enums, RLS, indexes, per-day allowance column, scrubbed seed import (unpublished) | Migrations apply clean; RLS denies cross-user reads; seed rows match CSV counts; no `fit_note` in repo | P0 | Planned | |
+| P0 | Setup: empty Next.js 16 app live on Vercel, Supabase + Google auth wired | Live URL loads; Google sign-in round trip works; no secrets in repo | none | Done | [P0](sprints/P0.md) / [tests](../tests/sprints/P0/README.md) |
+| P1 | Database: all tables, enums, RLS, indexes, per-day allowance column, scrubbed seed import (unpublished) | Migrations apply clean; RLS denies cross-user reads; seed rows match CSV counts; no `fit_note` in repo | P0 | Ready | |
 | P2 | Directory + filters + company/opportunity pages (public) | Filters in URL; "not disclosed" handled; remote hidden by default; works at 375px | P1 | Planned | |
 | P3 | Partnership checker + MOA board + cold-email list | Alias/fuzzy match; careful "not found" wording; bounced shown only as "do not use" | P1 | Planned | |
 | P4 | Auth + profile + private tracker + deployment checklist | Owner-only access by RLS; follow-ups due today highlighted; checklist "can do now" filter | P1 | Planned | |
@@ -26,5 +26,6 @@ before Phase 7 lands. Phases 2 and 3 are already public and shareable once deplo
   `OJT Hunter Website\` is older and missing the contacts table, bounces and the NU Manila point.
 
 ## Current handoff
-P0 code is done and committed locally (not pushed). Next: owner follows
-[setup-guide.md](setup-guide.md) steps 1 to 5, then we test local Google sign-in before pushing and deploying.
+P0 done 2026-10-23: live at https://ojthunter.vercel.app with Google sign-in. Open item: a classmate
+confirms sign-in. Next: P1 (database) in a new session. Before the P1 seed, settle the Sir Eds
+and contact-address to-dos above.
