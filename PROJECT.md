@@ -39,10 +39,14 @@ This repo is public, so anything committed is published.
 - Test data in the repo uses an obviously fake student.
 
 ## Environments
-`.env.local` (local, gitignored) and Vercel project settings. Names are in `.env.example`:
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_...` or legacy
-anon key; browser safe, protected by RLS), and from P1 `SUPABASE_SECRET_KEY` (server only, never
-`NEXT_PUBLIC_`) and `ADMIN_EMAILS`. Values never go in git or chat.
+`.env.local` (local, gitignored) and Vercel project settings: `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` only (`sb_publishable_...` or legacy anon key; browser safe,
+protected by RLS). Values never go in git or chat.
+
+Decision (2026-10-23): the spec suggested an `ADMIN_EMAILS` env var and a service-role key. Neither is
+used. Admins are rows in `public.admins`, added once in the Supabase SQL editor
+(`insert into public.admins select id from auth.users where email = '...'`), and checked by RLS and the
+server actions. The app holds no secret key, so none can leak.
 
 ## Known platform limits
 - Supabase Free pauses a project after ~7 days of low activity; restore from the dashboard, no data loss.

@@ -6,7 +6,7 @@ const site = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.
 
 // public pages plus every published role and company (read as an anonymous visitor)
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const pages: MetadataRoute.Sitemap = ["", "/partnership-checker", "/moa-board", "/cold-emails", "/templates", "/privacy"].map((p) => ({
+  const pages: MetadataRoute.Sitemap = ["", "/partnership-checker", "/moa-board", "/cold-emails", "/templates", "/form-tips", "/privacy"].map((p) => ({
     url: `${site}${p}`,
   }));
   if (!supabaseUrl || !supabaseKey) return pages;

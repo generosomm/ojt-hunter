@@ -133,7 +133,10 @@ function Draft({ template, values, role, signedIn, hasProfile }: Pick<Props, "va
 
       <fieldset className="glass rounded-[22px] p-4">
         <legend className="sr-only">Before you send</legend>
-        <p className="mb-2 text-sm font-semibold">Before you send</p>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold">Before you send</p>
+          <Link href="/form-tips" className="text-xs text-ink-soft underline underline-offset-4">Form tips</Link>
+        </div>
         <ul className="flex flex-col">
           {checks.map((c) => (
             <li key={c}>

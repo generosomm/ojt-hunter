@@ -22,6 +22,7 @@ Good habits:
 - **Remote roles** are hidden by default because fully remote OJT is not allowed for NU Laguna.
 - **Opened a post?** Tap Still open, Closed or Link dead on the role page. Two classmates saying it's closed sends it for review.
 - **Know something new?** Use "Share an update" at the top (pay confirmed, post closed, bounced email, new role). An admin checks it first.
+- **Filling an application form?** Read [Form tips](https://ojthunter.vercel.app/form-tips) first (prior internship, degree, tools, LECPA).
 - **Templates** fill from your profile. Anything the app doesn't know shows as [brackets]. Replace them, attach your resume, then send.
 
 Data is checked by students and can go out of date. Always confirm with the company and your FIC.

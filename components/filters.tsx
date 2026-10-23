@@ -8,10 +8,10 @@ import { activeCount, toSearch, type Filters, type Sort } from "@/lib/filters";
 import { devLabel, roleLabel, setupLabel } from "@/lib/labels";
 import { DEV_EXPOSURES, ROLE_CATEGORIES, type DevExposure, type RoleCategory } from "@/lib/types";
 
-type Props = { initial: Filters; cities: string[]; requiredHours: number; maxHours: number };
+type Props = { initial: Filters; cities: string[]; requiredHours: number; maxHours: number; canMatch: boolean };
 
 const EMPTY: Omit<Filters, "q" | "sort"> = {
-  city: "", roles: [], setups: [], remote: false, min: null, nd: false, hte: false, fits: false, nov: false, dev: [], closed: false,
+  city: "", roles: [], setups: [], remote: false, min: null, nd: false, hte: false, fits: false, me: false, nov: false, dev: [], closed: false,
 };
 
 function useUrlFilters(initial: Filters) {
@@ -63,7 +63,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Panel({ f, update, cities, requiredHours, maxHours }: { f: Filters; update: (f: Filters, delay?: number) => void; cities: string[]; requiredHours: number; maxHours: number }) {
+function Panel({ f, update, cities, requiredHours, maxHours, canMatch }: { f: Filters; update: (f: Filters, delay?: number) => void; cities: string[]; requiredHours: number; maxHours: number; canMatch: boolean }) {
   const set = (patch: Partial<Filters>, delay = 0) => update({ ...f, ...patch }, delay);
   const hoursHint = maxHours > requiredHours ? `${requiredHours} to ${maxHours} hrs` : `${requiredHours} hrs`;
   return (
@@ -77,6 +77,7 @@ function Panel({ f, update, cities, requiredHours, maxHours }: { f: Filters; upd
       </Group>
 
       <Group title="Must have">
+        {canMatch && <Chip on={f.me} onClick={() => set({ me: !f.me })}>Matches me</Chip>}
         <Chip on={f.hte} onClick={() => set({ hte: !f.hte })}>HTE partner</Chip>
         <Chip on={f.fits} onClick={() => set({ fits: !f.fits })}>Fits {hoursHint}</Chip>
         <Chip on={f.nov} onClick={() => set({ nov: !f.nov })}>Nov start OK</Chip>
@@ -143,11 +144,11 @@ function Panel({ f, update, cities, requiredHours, maxHours }: { f: Filters; upd
   );
 }
 
-export function DirectoryFilters({ initial, cities, requiredHours, maxHours }: Props) {
+export function DirectoryFilters({ initial, cities, requiredHours, maxHours, canMatch }: Props) {
   const { f, update, pending } = useUrlFilters(initial);
   const count = activeCount(f);
   const clear = () => update({ ...f, ...EMPTY });
-  const panel = <Panel f={f} update={update} cities={cities} requiredHours={requiredHours} maxHours={maxHours} />;
+  const panel = <Panel f={f} update={update} cities={cities} requiredHours={requiredHours} maxHours={maxHours} canMatch={canMatch} />;
 
   return (
     <>

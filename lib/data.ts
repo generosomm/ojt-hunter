@@ -8,7 +8,15 @@ import { PARTNER_STATUSES, type AppConfig, type Company, type Contact, type Fact
 const LISTING_COLUMNS =
   "id, slug, title, company_name, company_slug, role_category, city, setup, onsite_days_per_week, employment_type, dev_exposure, allowance_status, allowance_basis, allowance_amount, allowance_per_day_low, allowance_per_day_high, required_hours_min, required_hours_max, accepts_nov_start, post_status, last_checked_at, needs_recheck, partnership_status, is_published, created_at";
 
-export type Viewer = { userId: string | null; isAdmin: boolean; requiredHours: number; maxHours: number; hasProfileHours: boolean };
+export type Viewer = {
+  userId: string | null;
+  isAdmin: boolean;
+  requiredHours: number;
+  maxHours: number;
+  hasProfileHours: boolean;
+  cities: string[];
+  minPay: number | null;
+};
 
 export async function getConfig(): Promise<AppConfig> {
   const supabase = await createClient();
@@ -24,12 +32,12 @@ export async function getViewer(config: AppConfig): Promise<Viewer> {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = (data?.claims?.sub as string | undefined) ?? null;
-  const fallback = { userId, isAdmin: false, requiredHours: config.default_required_hours, maxHours: config.default_required_hours, hasProfileHours: false };
+  const fallback = { userId, isAdmin: false, requiredHours: config.default_required_hours, maxHours: config.default_required_hours, hasProfileHours: false, cities: [], minPay: null };
   if (!userId) return fallback;
 
   const [admin, profile] = await Promise.all([
     supabase.from("admins").select("user_id").eq("user_id", userId).maybeSingle(),
-    supabase.from("profiles").select("required_hours, max_hours").eq("user_id", userId).maybeSingle(),
+    supabase.from("profiles").select("required_hours, max_hours, preferred_cities, min_allowance_per_day").eq("user_id", userId).maybeSingle(),
   ]);
   const required = profile.data?.required_hours ?? config.default_required_hours;
   return {
@@ -38,6 +46,8 @@ export async function getViewer(config: AppConfig): Promise<Viewer> {
     requiredHours: required,
     maxHours: Math.max(profile.data?.max_hours ?? required, required),
     hasProfileHours: profile.data?.required_hours != null,
+    cities: (profile.data?.preferred_cities ?? []) as string[],
+    minPay: profile.data?.min_allowance_per_day ?? null,
   };
 }
 
@@ -56,6 +66,13 @@ export async function getListings(f: Filters, viewer: Viewer) {
       ? query.or(`allowance_per_day_high.gte.${f.min},allowance_status.eq.not_disclosed`)
       : query.gte("allowance_per_day_high", f.min);
   }
+  if (f.me && viewer.userId) {
+    // only letters and spaces reach the filter string
+    const cities = viewer.cities.map((c) => c.replace(/[^\p{L} .-]/gu, "").trim()).filter(Boolean);
+    if (cities.length) query = query.or(cities.map((c) => `city.ilike.%${c}%`).join(","));
+    // unknown pay is not unpaid, so "not disclosed" stays in
+    if (viewer.minPay) query = query.or(`allowance_per_day_high.gte.${viewer.minPay},allowance_status.eq.not_disclosed`);
+  }
   if (f.hte) query = query.in("partnership_status", [...PARTNER_STATUSES]);
   if (f.nov) query = query.neq("accepts_nov_start", "no");
   if (f.dev.length) query = query.in("dev_exposure", f.dev);
@@ -69,7 +86,7 @@ export async function getListings(f: Filters, viewer: Viewer) {
   const { data, error } = await query;
   if (error) throw new Error(`Could not load listings: ${error.message}`);
   let rows = (data ?? []) as Listing[];
-  if (f.fits) rows = rows.filter((r) => fitsHours(r.required_hours_min, r.required_hours_max, viewer.requiredHours, viewer.maxHours) !== false);
+  if (f.fits || (f.me && viewer.userId)) rows = rows.filter((r) => fitsHours(r.required_hours_min, r.required_hours_max, viewer.requiredHours, viewer.maxHours) !== false);
   return rows;
 }
 

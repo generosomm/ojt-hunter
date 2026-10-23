@@ -13,6 +13,7 @@ export type Filters = {
   nd: boolean; // keep "not disclosed" rows when a minimum is set
   hte: boolean;
   fits: boolean;
+  me: boolean; // apply the signed-in profile: cities, minimum pay, hours
   nov: boolean;
   dev: DevExposure[];
   closed: boolean;
@@ -43,6 +44,7 @@ export function parseFilters(p: Params): Filters {
     nd: flag(p, "nd"),
     hte: flag(p, "hte"),
     fits: flag(p, "fits"),
+    me: flag(p, "me"),
     nov: flag(p, "nov"),
     dev: list(p, "dev", DEV_EXPOSURES),
     closed: flag(p, "closed"),
@@ -61,6 +63,7 @@ export function toSearch(f: Filters) {
   if (f.nd) s.set("nd", "1");
   if (f.hte) s.set("hte", "1");
   if (f.fits) s.set("fits", "1");
+  if (f.me) s.set("me", "1");
   if (f.nov) s.set("nov", "1");
   if (f.dev.length) s.set("dev", f.dev.join(","));
   if (f.closed) s.set("closed", "1");
@@ -70,7 +73,7 @@ export function toSearch(f: Filters) {
 }
 
 export function activeCount(f: Filters) {
-  return [f.city, f.roles.length, f.setups.length, f.remote, f.min, f.hte, f.fits, f.nov, f.dev.length, f.closed].filter(Boolean).length;
+  return [f.me, f.city, f.roles.length, f.setups.length, f.remote, f.min, f.hte, f.fits, f.nov, f.dev.length, f.closed].filter(Boolean).length;
 }
 
 // city strings are free text ("Makati / Taguig (BGC)"), so options are the single place names found in them
