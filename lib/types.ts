@@ -101,6 +101,8 @@ export type Partnership = {
   matched_name_as_listed: string | null;
   source: string | null;
   notes: string | null;
+  // the HTE list version the match came from (may be older than the current list)
+  hte_entry: { list_version: string } | null;
 };
 
 export type Contact = {

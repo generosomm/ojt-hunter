@@ -58,3 +58,9 @@ anon key; browser safe, protected by RLS), and from P1 `SUPABASE_SECRET_KEY` (se
 One phase per session. Each phase: short plan, build, `npm run build` passes, manual test checklist,
 git commands to commit and push. Ledger: [docs/sprint-plan.md](docs/sprint-plan.md). Tests:
 [docs/testing.md](docs/testing.md).
+
+## Column-level permissions (P6)
+`opportunities`, `moa_requests`, `partnerships` and `fact_sources` grant public reads per column, so columns
+that point at a person (`created_by`, `last_checked_by`, `updated_by`, `added_by`) are never readable.
+A new column on these tables is invisible to visitors until you add it to the grant (and to
+`opportunity_listing`, which names its columns). Expect "permission denied" until you do.

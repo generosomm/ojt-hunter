@@ -111,10 +111,10 @@ export async function getCompany(slug: string) {
   const company = data as Company;
   const config = await getConfig();
   const [partnership, contacts, roles, moa] = await Promise.all([
-    supabase.from("partnerships").select("id, status, matched_name_as_listed, source, notes").eq("company_id", company.id).eq("campus", config.campus).maybeSingle(),
+    supabase.from("partnerships").select("id, status, matched_name_as_listed, source, notes, hte_entry:hte_list_entries(list_version)").eq("company_id", company.id).eq("campus", config.campus).maybeSingle(),
     supabase.from("company_contacts").select("id, email, purpose, status, bounce_code, notes, observed_on").eq("company_id", company.id),
     supabase.from("opportunity_listing").select(LISTING_COLUMNS).eq("company_id", company.id).order("post_status"),
-    supabase.from("moa_requests").select("id, status, requested_on").eq("company_id", company.id).eq("campus", config.campus).maybeSingle(),
+    supabase.from("moa_requests").select("id, status, requested_on, notes").eq("company_id", company.id).eq("campus", config.campus).maybeSingle(),
   ]);
   return {
     company,
@@ -122,7 +122,7 @@ export async function getCompany(slug: string) {
     partnership: (partnership.data ?? null) as Partnership | null,
     contacts: (contacts.data ?? []) as Contact[],
     roles: (roles.data ?? []) as Listing[],
-    moa: moa.data as { id: string; status: string; requested_on: string | null } | null,
+    moa: moa.data as { id: string; status: string; requested_on: string | null; notes: string | null } | null,
   };
 }
 

@@ -6,6 +6,7 @@ import { ArrowUpRight, BadgeCheck, Ban, Mail } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { OpportunityCard } from "@/components/opportunity-card";
+import { AdminPartnershipEditor } from "@/components/admin-partnership-editor";
 import { PublishToggle } from "@/components/publish-toggle";
 import { getCompany, getViewer } from "@/lib/data";
 import { dateText } from "@/lib/format";
@@ -47,7 +48,12 @@ async function CompanyView({ params }: Pick<PageProps<"/companies/[slug]">, "par
 
   return (
     <article className="flex flex-col gap-4">
-      {viewer.isAdmin && <PublishToggle slug={company.slug} published={company.is_published} kind="company" />}
+      {viewer.isAdmin && (
+        <div className="flex flex-col gap-2">
+          <PublishToggle slug={company.slug} published={company.is_published} kind="company" />
+          <AdminPartnershipEditor slug={company.slug} partnership={partnership} moa={moa} />
+        </div>
+      )}
       <header className="glass-strong rounded-[28px] p-5 sm:p-7">
         <h1 className="text-3xl font-semibold tracking-tight">{company.name}</h1>
         {company.legal_name && company.legal_name !== company.name && <p className="mt-1 text-sm text-ink-soft">{company.legal_name}</p>}
@@ -64,9 +70,13 @@ async function CompanyView({ params }: Pick<PageProps<"/companies/[slug]">, "par
             </div>
             <p className="text-sm text-ink-soft">
               {partnership.matched_name_as_listed
-                ? `Listed as "${partnership.matched_name_as_listed}" in the ${config.campus} ${config.hte_list_version} list.`
+                ? `Listed as "${partnership.matched_name_as_listed}" in the ${config.campus} ${partnership.hte_entry?.list_version ?? "school"} list.`
                 : partnership.notes}
             </p>
+            {/* the match is from the list it was found in; a newer list may not include it */}
+            {partnership.hte_entry && partnership.hte_entry.list_version !== config.hte_list_version && (
+              <p className="text-sm text-warn">Not re-checked against the current {config.hte_list_version} list yet. Ask your FIC.</p>
+            )}
             {partnership.matched_name_as_listed && partnership.notes && <p className="text-sm text-ink-soft">{partnership.notes}</p>}
           </div>
         )}

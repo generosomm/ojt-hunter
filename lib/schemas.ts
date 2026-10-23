@@ -194,3 +194,11 @@ export const roleEditSchema = z
     path: ["required_hours_max"],
     message: "Max hours can't be below min.",
   });
+
+export const partnershipEditSchema = z.object({
+  status: z.enum(["listed_in_hte", "confirmed_by_school", "confirmed_by_company", "not_listed", "moa_requested", "needs_clarification"]),
+  matched_name_as_listed: text(200),
+  notes: text(1000),
+  moa_status: z.enum(["none", "requested", "in_progress", "approved", "rejected", "unknown"]),
+  moa_notes: text(1000),
+});

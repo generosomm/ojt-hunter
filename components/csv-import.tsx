@@ -21,7 +21,8 @@ export function CsvImport({ currentVersion }: { currentVersion: string }) {
   const [fileName, setFileName] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const [version, setVersion] = useState("");
-  const [makeCurrent, setMakeCurrent] = useState(true);
+  // off by default: switching changes the live checker for everyone
+  const [makeCurrent, setMakeCurrent] = useState(false);
   const [pending, start] = useTransition();
 
   const reset = (m: Mode) => {
@@ -124,7 +125,7 @@ export function CsvImport({ currentVersion }: { currentVersion: string }) {
               </label>
               <label className="flex min-h-11 items-center gap-3 text-sm">
                 <input type="checkbox" checked={makeCurrent} onChange={(e) => setMakeCurrent(e.target.checked)} className="size-4 accent-[var(--nu-blue)]" />
-                Make it the current list (the checker uses it right away)
+                Switch the live checker to this list now (everyone sees it right away)
               </label>
             </div>
           )}

@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { adminSession } from "@/lib/admin";
-import { fieldErrors, roleEditSchema, type FieldErrors } from "@/lib/schemas";
+import { fieldErrors, partnershipEditSchema, roleEditSchema, type FieldErrors } from "@/lib/schemas";
 
 type Result = { ok: true; message?: string } | { ok: false; error: string };
 export type EditState = { ok: boolean; message?: string; errors?: FieldErrors };
@@ -53,14 +53,27 @@ export async function importRoles(rows: unknown[]): Promise<Result> {
   const { supabase, userId, isAdmin } = await adminSession();
   if (!isAdmin || !userId) return { ok: false, error: "Only admins can import." };
   if (!Array.isArray(rows) || rows.length === 0) return { ok: false, error: "The file has no rows." };
-  if (rows.length > 200) return { ok: false, error: "Import at most 200 rows at a time." };
+  // small batches keep each import well inside the hosting time limit
+  if (rows.length > 100) return { ok: false, error: "Import at most 100 rows at a time." };
 
   const parsed = rows.map((r) => roleRow.safeParse(r));
   const bad = parsed.findIndex((p) => !p.success);
   if (bad >= 0) return { ok: false, error: `Row ${bad + 2}: needs a company and a role title (and setup must be onsite, hybrid, remote or blank).` };
 
+  // skip roles that already exist (or repeat in the file), so re-running a file never duplicates
+  const key = (company: string, title: string) => `${company}|${title}`.toLowerCase().replace(/[^a-z0-9|]+/g, "");
+  const { data: existing } = await supabase.from("opportunity_listing").select("company_name, title");
+  const seen = new Set((existing ?? []).map((o) => key(String(o.company_name), String(o.title))));
+
   let added = 0;
+  let skipped = 0;
   for (const p of parsed) {
+    const k = key(p.data!.company, p.data!.title);
+    if (seen.has(k)) {
+      skipped++;
+      continue;
+    }
+    seen.add(k);
     const { apply_url, ...payload } = p.data!;
     const url = /^https:\/\/\S+$/.test(apply_url) ? apply_url : "";
     const { data: sub, error } = await supabase
@@ -74,7 +87,7 @@ export async function importRoles(rows: unknown[]): Promise<Result> {
     added++;
   }
   refresh();
-  return { ok: true, message: `Imported ${added} roles as drafts.` };
+  return { ok: true, message: `Imported ${added} roles as drafts${skipped ? `, skipped ${skipped} already listed` : ""}.` };
 }
 
 export async function importHte(version: string, entries: { no: number; name: string }[], makeCurrent: boolean): Promise<Result> {
@@ -88,4 +101,40 @@ export async function importHte(version: string, entries: { no: number; name: st
   if (error) return { ok: false, error: error.message };
   refresh();
   return { ok: true, message: `Imported ${data} entries${makeCurrent ? " and made it the current list" : ""}.` };
+}
+
+// admin edit of a company's partnership for this campus and its MOA request
+export async function updatePartnership(slug: string, _prev: EditState, form: FormData): Promise<EditState> {
+  const { supabase, userId, isAdmin } = await adminSession();
+  if (!isAdmin || !userId) return { ok: false, message: "Only admins can edit." };
+  const parsed = partnershipEditSchema.safeParse(Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)])));
+  if (!parsed.success) return { ok: false, message: "Check the highlighted fields.", errors: fieldErrors(parsed.error) };
+  const { moa_status, moa_notes, ...p } = parsed.data;
+
+  const [{ data: company }, { data: cfg }] = await Promise.all([
+    supabase.from("companies").select("id").eq("slug", slug).maybeSingle(),
+    supabase.from("app_config").select("campus, timezone").single(),
+  ]);
+  if (!company || !cfg) return { ok: false, message: "Company not found." };
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: cfg.timezone }).format(new Date());
+
+  // update-or-insert by hand: an upsert (ON CONFLICT DO UPDATE) needs table-wide read access,
+  // which this table deliberately doesn't grant (updated_by stays private)
+  const fields = { ...p, source: "Admin update", source_date: today, updated_by: userId };
+  const { data: current } = await supabase.from("partnerships").select("id").eq("company_id", company.id).eq("campus", cfg.campus).maybeSingle();
+  const { error } = current
+    ? await supabase.from("partnerships").update(fields).eq("id", current.id)
+    : await supabase.from("partnerships").insert({ company_id: company.id, campus: cfg.campus, ...fields });
+  if (error) return { ok: false, message: `Could not save: ${error.message}` };
+
+  // "none" never deletes an existing request; it only means "don't create one"
+  if (moa_status !== "none") {
+    const { data: existing } = await supabase.from("moa_requests").select("id").eq("company_id", company.id).eq("campus", cfg.campus).maybeSingle();
+    const { error: moaError } = existing
+      ? await supabase.from("moa_requests").update({ status: moa_status, notes: moa_notes, last_update: today }).eq("id", existing.id)
+      : await supabase.from("moa_requests").insert({ company_id: company.id, campus: cfg.campus, status: moa_status, notes: moa_notes, requested_on: today, last_update: today, created_by: userId });
+    if (moaError) return { ok: false, message: `Partnership saved, MOA not saved: ${moaError.message}` };
+  }
+  refresh();
+  return { ok: true, message: "Partnership saved" };
 }
