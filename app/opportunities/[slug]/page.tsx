@@ -164,6 +164,9 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
         {opp.schedule_text && (
           <Fact icon={<Clock className="size-3.5" />} label="Schedule">{opp.schedule_text}</Fact>
         )}
+        {opp.company_size_text && (
+          <Fact icon={<Briefcase className="size-3.5" />} label="Company size">{opp.company_size_text}</Fact>
+        )}
         {opp.employment_type !== "unknown" && (
           <Fact icon={<Briefcase className="size-3.5" />} label="Type">{opp.employment_type === "part_time" ? "Part-time" : "Full-time"}</Fact>
         )}

@@ -84,3 +84,6 @@ export const channelLabel: Record<string, string> = {
 export const applyLabel: Record<string, string> = {
   ...channelLabel, company_portal: "company site", email: "email", forms: "form", other: "link",
 };
+
+// company headcount bands, from the job board's "employees" line
+export const sizeLabel = { small: "Up to 50", medium: "51 to 100", large: "101 to 1,000", enterprise: "Over 1,000" } as const;

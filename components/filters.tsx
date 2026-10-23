@@ -4,14 +4,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { Drawer } from "vaul";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { activeCount, POSTED_WITHIN, toSearch, type Filters, type Sort } from "@/lib/filters";
-import { devLabel, roleLabel, setupLabel } from "@/lib/labels";
+import { activeCount, COMPANY_SIZES, POSTED_WITHIN, toSearch, type Filters, type Sort } from "@/lib/filters";
+import { devLabel, roleLabel, setupLabel, sizeLabel } from "@/lib/labels";
 import { DEV_EXPOSURES, ROLE_CATEGORIES, type DevExposure, type RoleCategory } from "@/lib/types";
 
 type Props = { initial: Filters; cities: string[]; requiredHours: number; maxHours: number; canMatch: boolean };
 
 const EMPTY: Omit<Filters, "q" | "sort"> = {
-  city: "", roles: [], setups: [], remote: false, min: null, nd: false, hte: false, fits: false, me: false, nov: false, dev: [], closed: false, posted: null,
+  city: "", roles: [], setups: [], remote: false, min: null, nd: false, hte: false, fits: false, me: false, nov: false, dev: [], closed: false, posted: null, sizes: [],
 };
 
 function useUrlFilters(initial: Filters) {
@@ -80,6 +80,14 @@ function Panel({ f, update, cities, requiredHours, maxHours, canMatch }: { f: Fi
         {POSTED_WITHIN.map((d) => (
           <Chip key={d} on={f.posted === d} onClick={() => set({ posted: f.posted === d ? null : d })}>
             {d} days
+          </Chip>
+        ))}
+      </Group>
+
+      <Group title="Company size">
+        {COMPANY_SIZES.map((s) => (
+          <Chip key={s} on={f.sizes.includes(s)} onClick={() => set({ sizes: toggle(f.sizes, s) })}>
+            {sizeLabel[s]}
           </Chip>
         ))}
       </Group>

@@ -52,6 +52,8 @@ export type Listing = {
   post_status: PostStatus;
   last_checked_at: string | null;
   posted_on: string | null;
+  company_size: "small" | "medium" | "large" | "enterprise" | null;
+  company_size_text: string | null;
   needs_recheck: boolean;
   partnership_status: PartnershipStatus | null;
   is_published: boolean;
