@@ -1,7 +1,9 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { OPEN_CHECK_RESULTS } from "@/lib/schemas";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -57,6 +59,20 @@ export async function setMoaSupport(moaRequestId: string, support: boolean): Pro
   const { error } = support
     ? await supabase.from("moa_request_supporters").upsert({ moa_request_id: moaRequestId, user_id: userId }, { ignoreDuplicates: true })
     : await supabase.from("moa_request_supporters").delete().eq("moa_request_id", moaRequestId).eq("user_id", userId);
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true };
+}
+
+// "Still open?" check from a signed-in classmate. The database keeps one per person per role per day,
+// refreshes "checked" on "open", and queues an admin review after enough closed/dead reports.
+export async function reportOpenCheck(opportunityId: string, result: string): Promise<Result> {
+  const { supabase, userId } = await signedIn();
+  if (!userId) return { ok: false, error: "Sign in to report." };
+  const parsed = z.enum(OPEN_CHECK_RESULTS).safeParse(result);
+  if (!parsed.success) return { ok: false, error: "Unknown answer." };
+  const { error } = await supabase.from("open_checks").insert({ opportunity_id: opportunityId, user_id: userId, result: parsed.data });
+  if (error?.code === "23505") return { ok: false, error: "You already checked this role today. Thanks!" };
   if (error) return { ok: false, error: error.message };
   refresh();
   return { ok: true };

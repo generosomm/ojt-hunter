@@ -5,8 +5,10 @@ import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
 import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, Mail, MapPin, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/badge";
+import { AdminRoleEditor } from "@/components/admin-role-editor";
 import { PublishToggle } from "@/components/publish-toggle";
 import { SaveRoleButton } from "@/components/save-role-button";
+import { StillOpen } from "@/components/still-open";
 import { getSavedOpportunityIds } from "@/lib/me";
 import { getConfig, getOpportunity, getViewer } from "@/lib/data";
 import { allowanceHeadline, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
@@ -54,7 +56,12 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
 
   return (
     <article className="flex flex-col gap-4">
-      {viewer.isAdmin && <PublishToggle slug={opp.slug} published={opp.is_published} />}
+      {viewer.isAdmin && (
+        <div className="flex flex-col gap-2">
+          <PublishToggle slug={opp.slug} published={opp.is_published} />
+          <AdminRoleEditor opp={opp} />
+        </div>
+      )}
 
       <header className="glass-strong rounded-[28px] p-5 sm:p-7">
         <Link href={`/companies/${opp.company_slug}`} className="text-sm text-ink-soft underline-offset-4 hover:underline">
@@ -101,6 +108,8 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
         </div>
         {opp.apply_instructions && <p className="mt-3 text-sm text-ink-soft">{opp.apply_instructions}</p>}
       </header>
+
+      {opp.is_published && <StillOpen opportunityId={opp.id} slug={opp.slug} signedIn={Boolean(viewer.userId)} />}
 
       {opp.setup === "remote" && (
         <p className="flex items-center gap-2 rounded-2xl bg-warn/12 p-4 text-sm text-warn">

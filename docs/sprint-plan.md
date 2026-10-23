@@ -12,7 +12,7 @@ Phases 2 and 3 are already public and shareable once deployed.
 | P3 | Partnership checker + MOA board + cold-email list | Alias/fuzzy match; careful "not found" wording; bounced shown only as "do not use" | P1 | Implemented | [P3](sprints/P3.md) / [tests](../tests/sprints/P3/README.md) |
 | P4 | Auth + profile + private tracker + deployment checklist | Owner-only access by RLS; follow-ups due today highlighted; checklist "can do now" filter | P1 | Implemented | [P4](sprints/P4.md) / [tests](../tests/sprints/P4/README.md) |
 | P5 | Templates page | Fills from profile only; subject/body copy; pre-send checklist; no em dashes | P4 | Implemented | [P5](sprints/P5.md) / [tests](../tests/sprints/P5/README.md) |
-| P6 | Submissions, "still open?" checks, admin review queue, CSV import | Normal user cannot approve; 2 dead-link reports flag for admin, never auto-close | P4 | Planned | |
+| P6 | Submissions, "still open?" checks, admin review queue, CSV import | Normal user cannot approve; 2 dead-link reports flag for admin, never auto-close | P4 | Implemented | [P6](sprints/P6.md) / [tests](../tests/sprints/P6/README.md) |
 | P7 | Polish: share links, OG image, loading/error pages, Vercel Analytics, README for friends | Messenger preview renders; 404 returns 404; measured mobile Lighthouse | P2-P6 | Planned | |
 
 ## Owner decisions
@@ -25,9 +25,9 @@ Phases 2 and 3 are already public and shareable once deployed.
 ## Carry-over for later phases
 - P3 (done): company-level publish added; KPMG published.
 - P4 (done): owner profile set to 600/800 hours.
-- P6 (before writing them): `opportunity_listing` (via `o.*`) and `moa_requests` expose `created_by` and `last_checked_by` to the public API. Drop them from the view or use column grants so classmates' ids are never public.
+- P6 (done): user ids hidden from the public API (view columns + column grants).
 - P7: not-found pages return status 200 with `noindex` while streaming; a true 404 needs a Proxy check.
 
 ## Current handoff
-P5 is built: templates page, Draft email on roles, Draft a follow-up in the tracker. Owner checks a signed-in draft,
-then P6 (submissions, still-open checks, admin queue, CSV import). Fix the P6 carry-over (public user ids) first.
+P6 is built: still-open checks, Share an update, admin queue with Now vs Proposed, role editor, CSV import.
+Owner tries the signed-in flows, then P7 (polish: OG image, loading/error pages, analytics, README for friends, true 404).
