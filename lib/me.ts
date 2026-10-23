@@ -1,8 +1,9 @@
 // Private, per-user reads. RLS limits every query to the signed-in user's own rows.
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { ApplicationStatus } from "./schemas";
 
-export async function currentUser() {
+async function loadCurrentUser() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = (data?.claims?.sub as string | undefined) ?? null;
@@ -34,7 +35,7 @@ export type Profile = {
   fic_name: string | null;
 };
 
-export async function getProfile(): Promise<Profile | null> {
+async function loadProfile(): Promise<Profile | null> {
   const { supabase, userId } = await currentUser();
   if (!userId) return null;
   const { data, error } = await supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle();
@@ -101,3 +102,7 @@ export function todayIn(timeZone: string) {
   // en-CA formats as YYYY-MM-DD
   return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
+
+// one auth check and one profile read per request, however many components ask
+export const currentUser = cache(loadCurrentUser);
+export const getProfile = cache(loadProfile);

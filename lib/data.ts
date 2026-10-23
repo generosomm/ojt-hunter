@@ -1,5 +1,6 @@
 // Server-side reads. Every query runs as the visitor, so Row Level Security decides what they see:
 // the public gets published rows only, admins also get drafts.
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Filters } from "./filters";
 import { fitsHours } from "./format";
@@ -18,7 +19,7 @@ export type Viewer = {
   minPay: number | null;
 };
 
-export async function getConfig(): Promise<AppConfig> {
+async function loadConfig(): Promise<AppConfig> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("app_config")
@@ -28,7 +29,7 @@ export async function getConfig(): Promise<AppConfig> {
   return data as AppConfig;
 }
 
-export async function getViewer(config: AppConfig): Promise<Viewer> {
+async function loadViewer(config: AppConfig): Promise<Viewer> {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = (data?.claims?.sub as string | undefined) ?? null;
@@ -90,7 +91,7 @@ export async function getListings(f: Filters, viewer: Viewer) {
   return rows;
 }
 
-export async function getDirectoryStats() {
+async function loadDirectoryStats() {
   const supabase = await createClient();
   const { data, error } = await supabase.from("opportunity_listing").select("city, partnership_status, post_status, setup");
   if (error) throw new Error(`Could not load stats: ${error.message}`);
@@ -217,3 +218,8 @@ export async function getColdEmails() {
   usable.sort((a, b) => Number(b.status === "reply_received") - Number(a.status === "reply_received") || (a.company?.name ?? "").localeCompare(b.company?.name ?? ""));
   return { usable, avoid: rows.filter((r) => !usable.includes(r)) };
 }
+
+// Each of these ran 2 to 3 times per page (hero, directory, top bar). cache() runs them once per request.
+export const getConfig = cache(loadConfig);
+export const getViewer = cache(loadViewer);
+export const getDirectoryStats = cache(loadDirectoryStats);

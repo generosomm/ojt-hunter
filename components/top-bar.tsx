@@ -2,13 +2,12 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Inbox, LogOut, MessageSquarePlus } from "lucide-react";
 import { SignInButton } from "@/components/sign-in-button";
-import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/me";
 
 export async function TopBar() {
   await connection();
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const userId = (data?.claims?.sub as string | undefined) ?? null;
+  // shared with the page: one auth check per request
+  const { supabase, userId } = await currentUser();
 
   // admins see how many submissions wait for review
   let pending: number | null = null;
