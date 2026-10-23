@@ -3,14 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
-import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, MapPin, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, Mail, MapPin, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { PublishToggle } from "@/components/publish-toggle";
 import { SaveRoleButton } from "@/components/save-role-button";
 import { getSavedOpportunityIds } from "@/lib/me";
 import { getConfig, getOpportunity, getViewer } from "@/lib/data";
 import { allowanceHeadline, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
-import { devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
+import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
 
 export async function generateMetadata({ params }: PageProps<"/opportunities/[slug]">): Promise<Metadata> {
   await connection();
@@ -39,11 +39,6 @@ function Fact({ icon, label, children }: { icon: ReactNode; label: string; child
     </div>
   );
 }
-
-const channelName: Record<string, string> = {
-  jobstreet: "JobStreet", linkedin: "LinkedIn", indeed: "Indeed", prosple: "Prosple", kalibrr: "Kalibrr", bossjob: "Bossjob",
-  company_portal: "company site", email: "email", forms: "form", facebook: "Facebook", other: "link",
-};
 
 async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, "params">) {
   await connection();
@@ -92,11 +87,17 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
               rel="noopener noreferrer"
               className="flex h-12 items-center justify-center gap-2 rounded-full bg-nu-blue px-7 font-medium text-white"
             >
-              Apply on {channelName[opp.apply_channel] ?? "the site"}
+              Apply on {applyLabel[opp.apply_channel] ?? "the site"}
               <ArrowUpRight className="size-4" />
             </a>
           )}
           <SaveRoleButton opportunityId={opp.id} saved={saved.has(opp.id)} signedIn={Boolean(viewer.userId)} />
+          <Link
+            href={`/templates?t=${opp.partnership_status === "not_listed" ? "moa_question" : "application"}&role=${opp.slug}`}
+            className="glass flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium"
+          >
+            <Mail className="size-4" /> Draft email
+          </Link>
         </div>
         {opp.apply_instructions && <p className="mt-3 text-sm text-ink-soft">{opp.apply_instructions}</p>}
       </header>

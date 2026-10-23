@@ -74,3 +74,13 @@ export const devTone: Record<DevExposure, Tone> = {
   low_repetitive: "warn",
   unknown: "muted",
 };
+
+// how a role is applied to, in plain words ("Apply on JobStreet", "I saw it on LinkedIn")
+export const channelLabel: Record<string, string> = {
+  jobstreet: "JobStreet", linkedin: "LinkedIn", indeed: "Indeed", prosple: "Prosple", kalibrr: "Kalibrr", bossjob: "Bossjob",
+  company_portal: "your careers page", email: "your post", forms: "your form", facebook: "Facebook", other: "your post",
+};
+
+export const applyLabel: Record<string, string> = {
+  ...channelLabel, company_portal: "company site", email: "email", forms: "form", other: "link",
+};

@@ -56,6 +56,12 @@ export function TrackerCard({ app, today }: Props) {
         )}
       </div>
 
+      {app.opportunity && status === "applied" && (
+        <Link href={`/templates?t=follow_up&role=${app.opportunity.slug}`} className="text-xs font-medium text-nu-blue underline underline-offset-4 dark:text-nu-gold">
+          Draft a follow-up
+        </Link>
+      )}
+
       {app.follow_up_on && (
         <p className={`flex items-center gap-1.5 text-xs ${due ? "font-medium text-warn" : "text-ink-soft"}`}>
           <BellRing className="size-3.5" />

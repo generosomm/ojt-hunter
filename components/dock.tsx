@@ -9,7 +9,7 @@ const items = [
   { href: "/partnership-checker", label: "HTE", icon: BadgeCheck, match: (p: string) => p.startsWith("/partnership-checker") },
   { href: "/moa-board", label: "MOA", icon: Handshake, match: (p: string) => p.startsWith("/moa-board") },
   { href: "/cold-emails", label: "Emails", icon: Mail, match: (p: string) => p.startsWith("/cold-emails") },
-  { href: "/me/tracker", label: "Me", icon: UserRound, match: (p: string) => p.startsWith("/me") },
+  { href: "/me/tracker", label: "Me", icon: UserRound, match: (p: string) => p.startsWith("/me") || p.startsWith("/templates") },
 ];
 
 // floating glass dock, like the macOS one; same on phone and desktop

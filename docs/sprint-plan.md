@@ -11,7 +11,7 @@ Phases 2 and 3 are already public and shareable once deployed.
 | P2 | Directory + filters + company/opportunity pages (public) | Filters in URL; "not disclosed" handled; remote hidden by default; works at 375px | P1 | Implemented | [P2](sprints/P2.md) / [tests](../tests/sprints/P2/README.md) |
 | P3 | Partnership checker + MOA board + cold-email list | Alias/fuzzy match; careful "not found" wording; bounced shown only as "do not use" | P1 | Implemented | [P3](sprints/P3.md) / [tests](../tests/sprints/P3/README.md) |
 | P4 | Auth + profile + private tracker + deployment checklist | Owner-only access by RLS; follow-ups due today highlighted; checklist "can do now" filter | P1 | Implemented | [P4](sprints/P4.md) / [tests](../tests/sprints/P4/README.md) |
-| P5 | Templates page | Fills from profile only; subject/body copy; pre-send checklist; no em dashes | P4 | Planned | |
+| P5 | Templates page | Fills from profile only; subject/body copy; pre-send checklist; no em dashes | P4 | Implemented | [P5](sprints/P5.md) / [tests](../tests/sprints/P5/README.md) |
 | P6 | Submissions, "still open?" checks, admin review queue, CSV import | Normal user cannot approve; 2 dead-link reports flag for admin, never auto-close | P4 | Planned | |
 | P7 | Polish: share links, OG image, loading/error pages, Vercel Analytics, README for friends | Messenger preview renders; 404 returns 404; measured mobile Lighthouse | P2-P6 | Planned | |
 
@@ -29,5 +29,5 @@ Phases 2 and 3 are already public and shareable once deployed.
 - P7: not-found pages return status 200 with `noindex` while streaming; a true 404 needs a Proxy check.
 
 ## Current handoff
-P4 is built: tracker, checklist, profile, Save to tracker, Me in the dock. Owner data loaded privately.
-Owner checks it signed in on a phone, then P5 (templates). Open P0 item: a classmate confirms sign-in.
+P5 is built: templates page, Draft email on roles, Draft a follow-up in the tracker. Owner checks a signed-in draft,
+then P6 (submissions, still-open checks, admin queue, CSV import). Fix the P6 carry-over (public user ids) first.
