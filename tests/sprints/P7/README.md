@@ -19,5 +19,8 @@
 | Anon can read boards and link status, can't run the checker or add boards | `link_checker.sql` | pass |
 | Signed-in student can't add boards; board URL must be https with {q} | `link_checker.sql` | pass |
 | Two dead answers for one role open one review item | `link_checker.sql` | pass |
-| Board search URL encodes and trims the words | `npm test` (board-url.test.ts) | 3 pass |
+| A blocked answer keeps a dead link dead | `link_checker.sql` | pass |
+| Admin rejects the item: Apply returns, next dead answer doesn't hide it or reopen the item | `link_checker.sql` | pass |
+| P6 review rules still hold after `review_submission` changed | `P6/review_access.sql` | pass |
+| Board search URL encodes and trims; suffixes dropped from the company name | `npm test` (board-url.test.ts) | 5 pass |
 | Live run against all 38 links | manual `start` then `collect` | 9 ok, 4 dead, 25 blocked; matches manual curl and browser checks |

@@ -32,3 +32,4 @@ Phases 2 and 3 are already public and shareable once deployed.
 All phases built. P2 to P6 confirmed by the owner on a phone. P7 is live; owner enables Vercel Analytics and checks a
 Messenger preview, then shares the link. Open P0 item: a classmate confirms sign-in (happens on first share).
 Keep `vercel.json` regions (`sin1`) in the same region as Supabase: a mismatch sends every query across the Pacific (pages went from about 0.5 s to 3 s).
+Nightly link check runs in Supabase pg_cron (02:00 and 02:15 Manila). Only about 14 to 19 of 38 links are readable by a bot (LinkedIn, JobStreet, Prosple block it); the "Find it on" board links cover the rest. First scheduled run not yet seen: check `cron.job_run_details` after 02:15.

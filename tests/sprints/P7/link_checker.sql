@@ -78,5 +78,40 @@ begin
   if items <> 1 then raise exception 'FAIL: expected 1 review item, got %', items; end if;
 end $$;
 
+-- a blocked answer keeps a dead link dead
+do $$
+declare opp uuid;
+begin
+  select id into opp from public.opportunities where is_published and link_status = 'dead' limit 1;
+  insert into net._http_response (id, status_code, content, created) values (-903, 403, '', now());
+  insert into private.link_check_requests (request_id, opportunity_id) values (-903, opp);
+  perform private.collect_link_checks();
+  if (select link_status from public.opportunities where id = opp) <> 'dead' then raise exception 'FAIL: blocked overwrote dead'; end if;
+end $$;
+
+-- the admin rejects the checker's item: Apply comes back and the next dead answer doesn't hide it again
+do $$
+declare
+  opp uuid;
+  item uuid;
+  admin_id uuid;
+begin
+  select id into opp from public.opportunities where is_published and link_status = 'dead' limit 1;
+  select id into item from public.submissions where opportunity_id = opp and type = 'post_closed' and status = 'pending';
+  select user_id into admin_id from public.admins order by created_at limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', admin_id, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  perform public.review_submission(item, false);
+  reset role;
+  if (select link_status from public.opportunities where id = opp) = 'dead' then raise exception 'FAIL: reject left the link dead'; end if;
+  insert into net._http_response (id, status_code, content, created) values (-904, 404, '', now());
+  insert into private.link_check_requests (request_id, opportunity_id) values (-904, opp);
+  perform private.collect_link_checks();
+  if (select link_status from public.opportunities where id = opp) = 'dead' then raise exception 'FAIL: checker overruled the admin'; end if;
+  if exists (select 1 from public.submissions where opportunity_id = opp and type = 'post_closed' and status = 'pending') then
+    raise exception 'FAIL: checker reopened a rejected item';
+  end if;
+end $$;
+
 select 'ALL PASS';
 rollback;
