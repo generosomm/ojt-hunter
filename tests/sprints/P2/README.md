@@ -10,3 +10,4 @@
 | Publish | Owner approved publishing all 44 (40 companies; KPMG has no role). Bulk-published by SQL; the in-app switch is still untested by the owner | partly passed 2026-10-23 |
 | Real phone | Tilt, bottom sheet, tap targets on a real phone | pending |
 | Filter combo | `/?min=300&hte=1` returns only Security Bank on live data | passed 2026-10-23 |
+| Desktop filter panel scrolls | Panel taller than the screen scrolls inside itself (`max-h: 100dvh - 11rem`, `overflow-y: auto`), ending above the dock. Computed at 1440x800: max-height 624px, top 80px | passed 2026-10-23 (computed styles; owner reported the bug) |

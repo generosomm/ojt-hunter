@@ -192,7 +192,9 @@ export function DirectoryFilters({ initial, cities, requiredHours, maxHours }: P
       </div>
 
       <aside className="hidden lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:block">
-        <div className="glass sticky top-20 rounded-[28px] p-5">
+        {/* taller than the screen: scroll inside, and stop above the dock */}
+        <div className="glass sticky top-20 max-h-[calc(100dvh-11rem)] overflow-y-auto overscroll-contain rounded-[28px] p-5">
+
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Filters</h2>
             {count > 0 && (
