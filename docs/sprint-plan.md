@@ -29,5 +29,5 @@ Phases 2 and 3 are already public and shareable once deployed.
 - P7: not-found pages return status 200 with `noindex` while streaming; a true 404 needs a Proxy check.
 
 ## Current handoff
-P2 is built and deployed. All 44 roles are drafts: the owner signs in on the live site, reviews them
-(admins see drafts) and publishes. Then real-phone check and P3. Open P0 item: a classmate confirms sign-in.
+P2 is live with all 44 roles published (40 companies). Left: owner checks the look on a real phone,
+and a classmate confirms sign-in. Then P3.
