@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Onest } from "next/font/google";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
+import { Dock } from "@/components/dock";
 import { TopBar } from "@/components/top-bar";
 import "./globals.css";
 
@@ -27,7 +28,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TopBar />
         </Suspense>
         {children}
-        <Toaster position="bottom-center" toastOptions={{ className: "glass-strong !text-ink !rounded-2xl" }} />
+        <Suspense fallback={null}>
+          <Dock />
+        </Suspense>
+        <Toaster position="top-center"toastOptions={{ className: "glass-strong !text-ink !rounded-2xl" }} />
       </body>
     </html>
   );

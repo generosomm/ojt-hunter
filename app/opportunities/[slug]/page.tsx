@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/opportunities/[sl
 
 export default function OpportunityPage({ params }: PageProps<"/opportunities/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-6">
       <Suspense fallback={<div className="glass h-96 animate-pulse rounded-[28px]" />}>
         <Opportunity params={params} />
       </Suspense>

@@ -6,6 +6,7 @@ import { ArrowUpRight, BadgeCheck, Ban, Mail } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { OpportunityCard } from "@/components/opportunity-card";
+import { PublishToggle } from "@/components/publish-toggle";
 import { getCompany, getViewer } from "@/lib/data";
 import { dateText } from "@/lib/format";
 import { partnerLabel, partnerTone } from "@/lib/labels";
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/companies/[slug]"
 
 export default function CompanyPage({ params }: PageProps<"/companies/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-6">
       <Suspense fallback={<div className="glass h-80 animate-pulse rounded-[28px]" />}>
         <CompanyView params={params} />
       </Suspense>
@@ -46,6 +47,7 @@ async function CompanyView({ params }: Pick<PageProps<"/companies/[slug]">, "par
 
   return (
     <article className="flex flex-col gap-4">
+      {viewer.isAdmin && <PublishToggle slug={company.slug} published={company.is_published} kind="company" />}
       <header className="glass-strong rounded-[28px] p-5 sm:p-7">
         <h1 className="text-3xl font-semibold tracking-tight">{company.name}</h1>
         {company.legal_name && company.legal_name !== company.name && <p className="mt-1 text-sm text-ink-soft">{company.legal_name}</p>}

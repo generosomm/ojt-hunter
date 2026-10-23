@@ -2,13 +2,15 @@
 
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { setPublished } from "@/app/actions";
+import { setCompanyPublished, setPublished } from "@/app/actions";
 
-export function PublishToggle({ slug, published }: { slug: string; published: boolean }) {
+type Props = { slug: string; published: boolean; kind?: "role" | "company" };
+
+export function PublishToggle({ slug, published, kind = "role" }: Props) {
   const [pending, start] = useTransition();
   const run = () =>
     start(async () => {
-      const res = await setPublished(slug, !published);
+      const res = kind === "company" ? await setCompanyPublished(slug, !published) : await setPublished(slug, !published);
       if (res.ok) toast.success(published ? "Unpublished" : "Published");
       else toast.error(res.error);
     });

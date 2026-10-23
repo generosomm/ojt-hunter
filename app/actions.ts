@@ -3,14 +3,25 @@
 import { refresh } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-// Admin only. RLS rejects the update for anyone else; the check here just gives a clear error.
-export async function setPublished(opportunitySlug: string, publish: boolean) {
+type Result = { ok: true } | { ok: false; error: string };
+
+async function signedIn() {
   const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  const userId = claims?.claims?.sub;
-  if (!userId) return { ok: false, error: "Sign in first." };
+  const { data } = await supabase.auth.getClaims();
+  return { supabase, userId: (data?.claims?.sub as string | undefined) ?? null };
+}
+
+// Admin checks here only give a clear error; RLS is what actually blocks everyone else.
+async function requireAdmin() {
+  const { supabase, userId } = await signedIn();
+  if (!userId) return { supabase, error: "Sign in first." };
   const { data: admin } = await supabase.from("admins").select("user_id").eq("user_id", userId).maybeSingle();
-  if (!admin) return { ok: false, error: "Only admins can publish." };
+  return { supabase, error: admin ? null : "Only admins can publish." };
+}
+
+export async function setPublished(opportunitySlug: string, publish: boolean): Promise<Result> {
+  const { supabase, error: denied } = await requireAdmin();
+  if (denied) return { ok: false, error: denied };
 
   const { data: opp, error } = await supabase
     .from("opportunities")
@@ -25,6 +36,28 @@ export async function setPublished(opportunitySlug: string, publish: boolean) {
     const { error: companyError } = await supabase.from("companies").update({ is_published: true }).eq("id", opp.company_id);
     if (companyError) return { ok: false, error: companyError.message };
   }
+  refresh();
+  return { ok: true };
+}
+
+// for companies without roles (e.g. only an MOA request)
+export async function setCompanyPublished(companySlug: string, publish: boolean): Promise<Result> {
+  const { supabase, error: denied } = await requireAdmin();
+  if (denied) return { ok: false, error: denied };
+  const { data, error } = await supabase.from("companies").update({ is_published: publish }).eq("slug", companySlug).select("id").maybeSingle();
+  if (error || !data) return { ok: false, error: error?.message ?? "Company not found." };
+  refresh();
+  return { ok: true };
+}
+
+// "I also need this MOA": signed-in users add or remove only their own row (RLS enforces it)
+export async function setMoaSupport(moaRequestId: string, support: boolean): Promise<Result> {
+  const { supabase, userId } = await signedIn();
+  if (!userId) return { ok: false, error: "Sign in to add yourself." };
+  const { error } = support
+    ? await supabase.from("moa_request_supporters").upsert({ moa_request_id: moaRequestId, user_id: userId }, { ignoreDuplicates: true })
+    : await supabase.from("moa_request_supporters").delete().eq("moa_request_id", moaRequestId).eq("user_id", userId);
+  if (error) return { ok: false, error: error.message };
   refresh();
   return { ok: true };
 }

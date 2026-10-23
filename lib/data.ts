@@ -125,3 +125,78 @@ export async function getCompany(slug: string) {
     moa: moa.data as { id: string; status: string; requested_on: string | null } | null,
   };
 }
+
+// ---------- P3: checker, MOA board, cold emails ----------
+
+export type HteMatch = { entry_no: number; name_as_listed: string; score: number };
+export type CompanyMatch = { slug: string; name: string; legal_name: string | null; partnership_status: Partnership["status"] | null; matched_name_as_listed: string | null; notes: string | null };
+export type Resource = { id: string; label: string; url: string; detail: string | null };
+
+export async function searchPartnership(q: string) {
+  const supabase = await createClient();
+  const [hte, companies] = await Promise.all([
+    supabase.rpc("search_hte", { q }),
+    supabase.rpc("search_companies", { q }),
+  ]);
+  if (hte.error) throw new Error(`Could not search the HTE list: ${hte.error.message}`);
+  if (companies.error) throw new Error(`Could not search companies: ${companies.error.message}`);
+  const rows = (hte.data ?? []) as HteMatch[];
+  // strong = the words are really in the listed name; weak = only looks similar
+  return {
+    strong: rows.filter((r) => r.score >= 0.85),
+    similar: rows.filter((r) => r.score < 0.85),
+    companies: (companies.data ?? []) as CompanyMatch[],
+  };
+}
+
+export async function getResources() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("resources").select("id, label, url, detail").order("sort_order");
+  return (data ?? []) as Resource[];
+}
+
+export type MoaRow = {
+  id: string;
+  status: string;
+  requested_on: string | null;
+  requested_via: string | null;
+  last_update: string | null;
+  notes: string | null;
+  company: { slug: string; name: string } | null;
+  supporters: number;
+  mine: boolean;
+};
+
+export async function getMoaBoard(userId: string | null): Promise<MoaRow[]> {
+  const supabase = await createClient();
+  const config = await getConfig();
+  const [requests, counts, mine] = await Promise.all([
+    supabase.from("moa_requests").select("id, status, requested_on, requested_via, last_update, notes, company:companies(slug, name)").eq("campus", config.campus).order("requested_on", { ascending: false }),
+    supabase.rpc("moa_supporter_counts"),
+    userId ? supabase.from("moa_request_supporters").select("moa_request_id").eq("user_id", userId) : Promise.resolve({ data: [] as { moa_request_id: string }[] }),
+  ]);
+  if (requests.error) throw new Error(`Could not load MOA requests: ${requests.error.message}`);
+  const count = new Map(((counts.data ?? []) as { moa_request_id: string; supporters: number }[]).map((c) => [c.moa_request_id, Number(c.supporters)]));
+  const own = new Set((mine.data ?? []).map((m) => m.moa_request_id));
+  return (requests.data ?? []).map((r) => ({
+    ...(r as unknown as Omit<MoaRow, "supporters" | "mine">),
+    supporters: count.get(r.id) ?? 0,
+    mine: own.has(r.id),
+  }));
+}
+
+export type EmailRow = Contact & { company: { slug: string; name: string } | null };
+
+export async function getColdEmails() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("company_contacts")
+    .select("id, email, purpose, status, bounce_code, notes, observed_on, company:companies(slug, name)")
+    .order("status");
+  if (error) throw new Error(`Could not load emails: ${error.message}`);
+  const rows = (data ?? []) as unknown as EmailRow[];
+  const usable = rows.filter((r) => r.status === "reply_received" || r.status === "published_untested");
+  // replied-before first, then by company
+  usable.sort((a, b) => Number(b.status === "reply_received") - Number(a.status === "reply_received") || (a.company?.name ?? "").localeCompare(b.company?.name ?? ""));
+  return { usable, avoid: rows.filter((r) => !usable.includes(r)) };
+}

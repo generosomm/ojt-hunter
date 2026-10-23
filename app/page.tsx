@@ -8,7 +8,7 @@ import { cityOptions, parseFilters } from "@/lib/filters";
 
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-24">
+    <main className="mx-auto w-full max-w-6xl px-4 pb-28">
       <Suspense fallback={<HeroSkeleton />}>
         <Hero />
       </Suspense>
