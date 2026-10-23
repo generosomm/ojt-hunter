@@ -78,6 +78,7 @@ export function AdminRoleEditor({ opp }: { opp: OpportunityDetail }) {
       <Field label="Nov start" name="accepts_nov_start" error={e.accepts_nov_start}>
         {sel("accepts_nov_start", opp.accepts_nov_start, [["yes", "Yes"], ["no", "No"], ["ask", "Ask"]])}
       </Field>
+      <Field label="Posted on" name="posted_on" error={e.posted_on}>{inp("posted_on", opp.posted_on, { type: "date" })}</Field>
       <Field label="Apply link" name="apply_url" error={e.apply_url}>{inp("apply_url", opp.apply_url, { type: "url" })}</Field>
       <Field label="Apply instructions" name="apply_instructions" error={e.apply_instructions}>{inp("apply_instructions", opp.apply_instructions)}</Field>
       <div className="sm:col-span-2">

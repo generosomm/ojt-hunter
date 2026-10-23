@@ -3,11 +3,11 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Filters } from "./filters";
-import { fitsHours } from "./format";
+import { daysAgo, fitsHours } from "./format";
 import { PARTNER_STATUSES, type AppConfig, type Company, type Contact, type Fact, type Listing, type OpportunityDetail, type Partnership } from "./types";
 
 const LISTING_COLUMNS =
-  "id, slug, title, company_name, company_slug, role_category, city, setup, onsite_days_per_week, employment_type, dev_exposure, allowance_status, allowance_basis, allowance_amount, allowance_per_day_low, allowance_per_day_high, required_hours_min, required_hours_max, accepts_nov_start, post_status, last_checked_at, needs_recheck, partnership_status, is_published, created_at";
+  "id, slug, title, company_name, company_slug, role_category, city, setup, onsite_days_per_week, employment_type, dev_exposure, allowance_status, allowance_basis, allowance_amount, allowance_per_day_low, allowance_per_day_high, required_hours_min, required_hours_max, accepts_nov_start, post_status, last_checked_at, needs_recheck, partnership_status, is_published, created_at, posted_on";
 
 export type Viewer = {
   userId: string | null;
@@ -78,11 +78,13 @@ export async function getListings(f: Filters, viewer: Viewer) {
   if (f.nov) query = query.neq("accepts_nov_start", "no");
   if (f.dev.length) query = query.in("dev_exposure", f.dev);
   if (!f.closed) query = query.neq("post_status", "closed");
+  // roles with no known post date drop out: we can't say they are recent
+  if (f.posted) query = query.gte("posted_on", daysAgo(f.posted, (await getConfig()).timezone));
 
   // unknown pay never sorts as zero: it goes last
   if (f.sort === "pay") query = query.order("allowance_per_day_high", { ascending: false, nullsFirst: false }).order("last_checked_at", { ascending: false });
   if (f.sort === "checked") query = query.order("last_checked_at", { ascending: false, nullsFirst: false });
-  if (f.sort === "new") query = query.order("created_at", { ascending: false });
+  if (f.sort === "new") query = query.order("posted_on", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false });
 
   const { data, error } = await query;
   if (error) throw new Error(`Could not load listings: ${error.message}`);

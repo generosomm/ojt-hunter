@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BadgeCheck, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/badge";
-import { allowanceHeadline, checkedAgo, fitsHours, hoursText } from "@/lib/format";
+import { allowanceHeadline, checkedAgo, fitsHours, hoursText, postedAgo } from "@/lib/format";
 import { devLabel, devTone, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
 import type { Listing } from "@/lib/types";
 
@@ -53,7 +53,8 @@ export function OpportunityCard({ item, timeZone, requiredHours, maxHours }: Pro
         </span>
         <span className={`flex shrink-0 items-center gap-1 ${item.needs_recheck ? "text-warn" : ""}`}>
           <Clock className="size-3.5" />
-          {item.needs_recheck ? "Needs re-check" : checkedAgo(item.last_checked_at, timeZone)}
+          {/* when the company posted it says more about freshness than our last check; the role page shows both */}
+          {item.needs_recheck ? "Needs re-check" : (postedAgo(item.posted_on, timeZone) ?? checkedAgo(item.last_checked_at, timeZone))}
         </span>
       </div>
     </Link>

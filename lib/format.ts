@@ -56,3 +56,17 @@ export function boardSearchWords(company: string) {
   const name = company.replace(SUFFIX, "").replace(/[(),]/g, " ").replace(/\s+/g, " ").trim();
   return `${name || company} intern`;
 }
+
+// the calendar date N days before today in the app's time zone, as YYYY-MM-DD (en-CA formats that way)
+export function daysAgo(days: number, timeZone: string, now = new Date()) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(now.getTime() - days * 86_400_000));
+}
+
+export function postedAgo(date: string | null, timeZone: string, now = new Date()) {
+  if (!date) return null;
+  const today = daysAgo(0, timeZone, now);
+  const days = Math.round((Date.parse(today) - Date.parse(date)) / 86_400_000);
+  if (days <= 0) return "Posted today";
+  if (days === 1) return "Posted yesterday";
+  return `Posted ${days}d ago`;
+}

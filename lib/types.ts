@@ -51,6 +51,7 @@ export type Listing = {
   accepts_nov_start: YesNoAsk;
   post_status: PostStatus;
   last_checked_at: string | null;
+  posted_on: string | null;
   needs_recheck: boolean;
   partnership_status: PartnershipStatus | null;
   is_published: boolean;

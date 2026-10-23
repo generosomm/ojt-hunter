@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/sprints/P5/fill.test.ts tests/sprints/P7/board-url.test.ts"
+    "test": "node --test tests/sprints/P5/fill.test.ts tests/sprints/P7/board-url.test.ts tests/sprints/P7/posted.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

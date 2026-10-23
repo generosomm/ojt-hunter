@@ -35,14 +35,15 @@ export function TemplateStudio({ templates, roles, values, signedIn, hasProfile,
             ))}
           </select>
         </label>
-        <nav aria-label="Templates" className="flex gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
+        {/* phones: every type visible in a 2-column grid, no sideways scrolling */}
+        <nav aria-label="Templates" className="grid grid-cols-2 gap-1.5 lg:flex lg:flex-col">
           {templates.map((t) => (
             <button
               key={t.key}
               type="button"
               aria-pressed={t.key === template.key}
               onClick={() => go(t.key, role?.slug ?? null)}
-              className={`h-10 shrink-0 rounded-full px-4 text-left text-sm lg:rounded-2xl ${t.key === template.key ? "bg-nu-blue text-white" : "glass"}`}
+              className={`min-h-11 rounded-2xl px-3 py-2 text-center text-sm leading-tight lg:min-h-10 lg:px-4 lg:text-left ${t.key === template.key ? "bg-nu-blue text-white" : "glass"}`}
             >
               {t.name}
             </button>

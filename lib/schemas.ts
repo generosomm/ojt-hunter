@@ -172,6 +172,12 @@ export const roleEditSchema = z
     required_hours_min: optionalInt(1, 3000),
     required_hours_max: optionalInt(1, 3000),
     accepts_nov_start: z.enum(["yes", "no", "ask"]),
+    // the date on the job board post; blank when the board doesn't show one
+    posted_on: z
+      .string()
+      .trim()
+      .refine((v) => v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v), "Use a date.")
+      .transform((v) => v || null),
     dev_exposure: z.enum(["high", "some", "low", "low_repetitive", "unknown"]),
     apply_url: url,
     apply_instructions: text(500),

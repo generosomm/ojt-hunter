@@ -11,7 +11,7 @@ import { SaveRoleButton } from "@/components/save-role-button";
 import { StillOpen } from "@/components/still-open";
 import { getSavedOpportunityIds } from "@/lib/me";
 import { getConfig, getJobBoards, getOpportunity, getViewer } from "@/lib/data";
-import { allowanceHeadline, boardSearchUrl, boardSearchWords, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
+import { allowanceHeadline, boardSearchUrl, boardSearchWords, checkedAgo, postedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
 import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
 
 export async function generateMetadata({ params }: PageProps<"/opportunities/[slug]">): Promise<Metadata> {
@@ -173,6 +173,7 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
         <Fact icon={<Clock className="size-3.5" />} label="Last checked">
           {checkedAgo(opp.last_checked_at, config.timezone)}
           {opp.needs_recheck && <span className="block text-warn">Needs re-check</span>}
+          {opp.posted_on && <span className="block text-ink-soft">{postedAgo(opp.posted_on, config.timezone)}</span>}
         </Fact>
       </div>
 
