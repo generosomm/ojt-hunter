@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { SignInButton } from "@/components/sign-in-button";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +22,8 @@ export default function Home({ searchParams }: PageProps<"/">) {
 }
 
 async function AuthStatus({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
+  // Supabase checks token expiry with Date.now(), so render this only at request time.
+  await connection();
   const { auth_error } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
