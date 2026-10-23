@@ -31,7 +31,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${onest.variable} h-full antialiased`}>
       <body className="min-h-full">
-        <Suspense fallback={<div className="h-16" />}>
+        {/* same height as the bar (pt-3 + h-12 = 60px) so the page does not jump when it streams in */}
+        <Suspense fallback={<div className="h-15" />}>
           <TopBar />
         </Suspense>
         {children}
