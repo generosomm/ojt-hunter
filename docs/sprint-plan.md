@@ -31,3 +31,4 @@ Phases 2 and 3 are already public and shareable once deployed.
 ## Current handoff
 All phases built. P2 to P6 confirmed by the owner on a phone. P7 is live; owner enables Vercel Analytics and checks a
 Messenger preview, then shares the link. Open P0 item: a classmate confirms sign-in (happens on first share).
+Keep `vercel.json` regions (`sin1`) in the same region as Supabase: a mismatch sends every query across the Pacific (pages went from about 0.5 s to 3 s).

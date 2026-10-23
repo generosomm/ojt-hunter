@@ -7,14 +7,19 @@ export function SignInButton({ compact = false }: { compact?: boolean }) {
 
   async function signIn() {
     setLoading(true);
-    // loaded on click: most visitors never sign in, so the auth library stays out of the first page load
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (error) setLoading(false);
+    try {
+      // loaded on click: most visitors never sign in, so the auth library stays out of the first page load
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) setLoading(false);
+    } catch {
+      // a stale tab after a redeploy or a dropped connection: let them tap again
+      setLoading(false);
+    }
   }
 
   return (
