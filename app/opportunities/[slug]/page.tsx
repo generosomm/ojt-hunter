@@ -6,6 +6,8 @@ import { Suspense, type ReactNode } from "react";
 import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, MapPin, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { PublishToggle } from "@/components/publish-toggle";
+import { SaveRoleButton } from "@/components/save-role-button";
+import { getSavedOpportunityIds } from "@/lib/me";
 import { getConfig, getOpportunity, getViewer } from "@/lib/data";
 import { allowanceHeadline, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
 import { devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
@@ -48,7 +50,7 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
   const { slug } = await params;
   const [data, config] = await Promise.all([getOpportunity(slug), getConfig()]);
   if (!data) notFound();
-  const viewer = await getViewer(config);
+  const [viewer, saved] = await Promise.all([getViewer(config), getSavedOpportunityIds()]);
   const { opp, facts, checks } = data;
   const pay = allowanceHeadline(opp);
   const hours = hoursText(opp.required_hours_min, opp.required_hours_max);
@@ -82,17 +84,20 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
           {opp.dev_exposure !== "unknown" && <Badge tone={devTone[opp.dev_exposure]}>{devLabel[opp.dev_exposure]}</Badge>}
         </div>
 
-        {opp.apply_url && (
-          <a
-            href={opp.apply_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-nu-blue font-medium text-white sm:w-auto sm:px-7"
-          >
-            Apply on {channelName[opp.apply_channel] ?? "the site"}
-            <ArrowUpRight className="size-4" />
-          </a>
-        )}
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+          {opp.apply_url && (
+            <a
+              href={opp.apply_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 items-center justify-center gap-2 rounded-full bg-nu-blue px-7 font-medium text-white"
+            >
+              Apply on {channelName[opp.apply_channel] ?? "the site"}
+              <ArrowUpRight className="size-4" />
+            </a>
+          )}
+          <SaveRoleButton opportunityId={opp.id} saved={saved.has(opp.id)} signedIn={Boolean(viewer.userId)} />
+        </div>
         {opp.apply_instructions && <p className="mt-3 text-sm text-ink-soft">{opp.apply_instructions}</p>}
       </header>
 

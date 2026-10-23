@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BadgeCheck, Briefcase, Handshake, Mail } from "lucide-react";
+import { BadgeCheck, Briefcase, Handshake, Mail, UserRound } from "lucide-react";
 
 const items = [
   { href: "/", label: "Roles", icon: Briefcase, match: (p: string) => p === "/" || p.startsWith("/opportunities") || p.startsWith("/companies") },
   { href: "/partnership-checker", label: "HTE", icon: BadgeCheck, match: (p: string) => p.startsWith("/partnership-checker") },
   { href: "/moa-board", label: "MOA", icon: Handshake, match: (p: string) => p.startsWith("/moa-board") },
   { href: "/cold-emails", label: "Emails", icon: Mail, match: (p: string) => p.startsWith("/cold-emails") },
+  { href: "/me/tracker", label: "Me", icon: UserRound, match: (p: string) => p.startsWith("/me") },
 ];
 
 // floating glass dock, like the macOS one; same on phone and desktop
@@ -24,7 +25,7 @@ export function Dock() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-12 min-w-16 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-[11px] font-medium transition-colors ${
+                className={`flex h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-full px-2.5 text-[11px] font-medium transition-colors ${
                   active ? "bg-nu-blue text-white" : "text-ink-soft hover:text-ink"
                 }`}
               >
