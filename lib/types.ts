@@ -77,6 +77,8 @@ export type OpportunityDetail = Listing & {
   source_url: string | null;
   notes: string | null;
   matched_name_as_listed: string | null;
+  link_status: "unknown" | "ok" | "dead" | "blocked";
+  link_checked_at: string | null;
 };
 
 export type Company = {

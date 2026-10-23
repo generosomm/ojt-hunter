@@ -43,3 +43,8 @@ export function dateText(d: string | null, timeZone: string) {
   if (!d) return null;
   return new Date(d).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric", timeZone });
 }
+
+// job board search link: {q} in the stored template becomes the encoded search words
+export function boardSearchUrl(template: string, q: string) {
+  return template.replaceAll("{q}", encodeURIComponent(q.trim()));
+}

@@ -3,15 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
-import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, Mail, MapPin, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Briefcase, CalendarClock, Clock, Code2, Link2Off, Mail, MapPin, Search, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { AdminRoleEditor } from "@/components/admin-role-editor";
 import { PublishToggle } from "@/components/publish-toggle";
 import { SaveRoleButton } from "@/components/save-role-button";
 import { StillOpen } from "@/components/still-open";
 import { getSavedOpportunityIds } from "@/lib/me";
-import { getConfig, getOpportunity, getViewer } from "@/lib/data";
-import { allowanceHeadline, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
+import { getConfig, getJobBoards, getOpportunity, getViewer } from "@/lib/data";
+import { allowanceHeadline, boardSearchUrl, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
 import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
 
 export async function generateMetadata({ params }: PageProps<"/opportunities/[slug]">): Promise<Metadata> {
@@ -47,7 +47,7 @@ function Fact({ icon, label, children }: { icon: ReactNode; label: string; child
 async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, "params">) {
   await connection();
   const { slug } = await params;
-  const [data, config] = await Promise.all([getOpportunity(slug), getConfig()]);
+  const [data, config, boards] = await Promise.all([getOpportunity(slug), getConfig(), getJobBoards()]);
   if (!data) notFound();
   const [viewer, saved] = await Promise.all([getViewer(config), getSavedOpportunityIds()]);
   const { opp, facts, checks } = data;
@@ -89,7 +89,12 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
         </div>
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          {opp.apply_url && (
+          {opp.apply_url && opp.link_status === "dead" ? (
+            // the nightly check found the post gone: send people to the job boards instead of a dead page
+            <span className="flex h-12 items-center justify-center gap-2 rounded-full bg-warn/12 px-6 text-sm font-medium text-warn">
+              <Link2Off className="size-4" /> Post link is down
+            </span>
+          ) : opp.apply_url && (
             <a
               href={opp.apply_url}
               target="_blank"
@@ -109,6 +114,26 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
           </Link>
         </div>
         {opp.apply_instructions && <p className="mt-3 text-sm text-ink-soft">{opp.apply_instructions}</p>}
+
+        {boards.length > 0 && (
+          <div className="mt-5 flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 flex items-center gap-1 text-xs text-ink-soft">
+              <Search className="size-3.5" /> Find it on
+            </span>
+            {boards.map((b) => (
+              <a
+                key={b.name}
+                href={boardSearchUrl(b.search_url, `${opp.company_name} intern`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass flex h-8 items-center gap-1 rounded-full px-3 text-xs font-medium hover:bg-white/50"
+              >
+                {b.name}
+                <ArrowUpRight className="size-3" />
+              </a>
+            ))}
+          </div>
+        )}
       </header>
 
       {opp.is_published && <StillOpen opportunityId={opp.id} slug={opp.slug} signedIn={Boolean(viewer.userId)} />}

@@ -10,3 +10,14 @@
 | Build | `npm run build`, `tsc`, `lint`, `npm test` | passed 2026-10-23 |
 | Analytics enabled | Vercel project > Analytics > Enable, then a visit shows up | pending (owner) |
 | Messenger preview | Paste the link in a chat | pending (owner) |
+
+## Link checker and job boards (2026-10-24)
+
+| Test | How | Result |
+| --- | --- | --- |
+| Verdicts: 404/410 and "closed" text dead, 2xx/3xx ok, 403/429/999/timeout blocked | `link_checker.sql` | pass |
+| Anon can read boards and link status, can't run the checker or add boards | `link_checker.sql` | pass |
+| Signed-in student can't add boards; board URL must be https with {q} | `link_checker.sql` | pass |
+| Two dead answers for one role open one review item | `link_checker.sql` | pass |
+| Board search URL encodes and trims the words | `npm test` (board-url.test.ts) | 3 pass |
+| Live run against all 38 links | manual `start` then `collect` | 9 ok, 4 dead, 25 blocked; matches manual curl and browser checks |

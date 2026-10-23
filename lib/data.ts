@@ -203,6 +203,14 @@ export async function getMoaBoard(userId: string | null): Promise<MoaRow[]> {
   }));
 }
 
+export type JobBoard = { name: string; search_url: string };
+
+async function loadJobBoards() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("job_boards").select("name, search_url").eq("is_active", true).order("sort_order");
+  return (data ?? []) as JobBoard[];
+}
+
 export type EmailRow = Contact & { company: { slug: string; name: string } | null };
 
 export async function getColdEmails() {
@@ -223,3 +231,4 @@ export async function getColdEmails() {
 export const getConfig = cache(loadConfig);
 export const getViewer = cache(loadViewer);
 export const getDirectoryStats = cache(loadDirectoryStats);
+export const getJobBoards = cache(loadJobBoards);
