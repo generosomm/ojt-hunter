@@ -13,7 +13,8 @@ const tabs = [
 export function MeTabs() {
   const pathname = usePathname();
   return (
-    <nav aria-label="My pages" className="glass flex w-fit gap-1 rounded-full p-1">
+    // phones: four tabs share the width evenly (a fixed width overflowed 375px screens)
+    <nav aria-label="My pages" className="glass flex w-full gap-1 rounded-full p-1 sm:w-fit">
       {tabs.map((t) => {
         const active = pathname.startsWith(t.href);
         return (
@@ -21,7 +22,7 @@ export function MeTabs() {
             key={t.href}
             href={t.href}
             aria-current={active ? "page" : undefined}
-            className={`flex h-10 items-center rounded-full px-4 text-sm font-medium ${active ? "bg-nu-blue text-white" : "text-ink-soft hover:text-ink"}`}
+            className={`flex h-10 flex-1 items-center justify-center rounded-full px-2 text-sm font-medium sm:flex-none sm:px-4 ${active ? "bg-nu-blue text-white" : "text-ink-soft hover:text-ink"}`}
           >
             {t.label}
           </Link>

@@ -45,9 +45,9 @@ async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">)
   const [items, stats] = await Promise.all([getListings(filters, viewer), getDirectoryStats()]);
 
   return (
-    <section aria-label="OJT openings" className="grid gap-5 lg:grid-cols-[300px_1fr] lg:gap-6">
+    <section aria-label="OJT openings" className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-6">
       <DirectoryFilters initial={filters} cities={cityOptions(stats.cities)} requiredHours={viewer.requiredHours} maxHours={viewer.maxHours} />
-      <div className="flex flex-col gap-3 lg:col-start-2">
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-2">
         <p className="px-1 text-sm text-ink-soft" aria-live="polite">
           {items.length} {items.length === 1 ? "role" : "roles"}
         </p>

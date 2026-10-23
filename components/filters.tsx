@@ -151,7 +151,7 @@ export function DirectoryFilters({ initial, cities, requiredHours, maxHours }: P
 
   return (
     <>
-      <div className="flex items-center gap-2 lg:col-start-2 lg:row-start-1">
+      <div className="flex min-w-0 items-center gap-2 lg:col-start-2 lg:row-start-1">
         <label className="glass flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full px-4">
           <Search className="size-4 shrink-0 text-ink-soft" />
           <input

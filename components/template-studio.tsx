@@ -24,11 +24,11 @@ export function TemplateStudio({ templates, roles, values, signedIn, hasProfile,
   if (!template) return <p className="glass rounded-[22px] p-6 text-center text-sm text-ink-soft">No templates yet.</p>;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-      <aside className="flex flex-col gap-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <aside className="flex min-w-0 flex-col gap-3">
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-ink-soft">Role</span>
-          <select value={role?.slug ?? ""} onChange={(e) => go(template.key, e.target.value || null)} className="glass h-11 rounded-2xl px-3 text-base">
+          <select value={role?.slug ?? ""} onChange={(e) => go(template.key, e.target.value || null)} className="glass h-11 w-full min-w-0 rounded-2xl px-3 text-base">
             <option value="">No role picked</option>
             {roles.map((r) => (
               <option key={r.slug} value={r.slug}>{r.label}</option>
