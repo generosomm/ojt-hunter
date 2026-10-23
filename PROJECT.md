@@ -12,7 +12,16 @@
 - `lib/supabase/`: `client.ts` (browser), `server.ts` (per request), `env.ts` (public env vars).
 - `proxy.ts`: Next 16's renamed middleware; refreshes the session cookie only, not authorization.
 - `components/`: shared UI.
-- Coming later: `supabase/migrations/`, `supabase/seed/` (scrubbed public seed only), `private/` (gitignored).
+- `supabase/migrations/`: schema and access rules. File names match the versions recorded in the
+  Supabase project (`list_migrations`); keep them in sync when adding one.
+- `supabase/seed/listings.mjs`: the curated, public-safe seed data (edit here, not in seed.sql).
+  `node scripts/build-seed.mjs` validates it and writes `supabase/seed.sql` (one-time import).
+- `supabase/seed/hte_list_2026-27.csv`: the school's HTE list (owner confirmed it can be public, 2026-10-23).
+- `tests/sprints/P1/rls.sql`: access-rule test, runs in a rolled-back transaction.
+- `private/` (gitignored): anything personal, e.g. the owner's own tracker rows.
+- Data model: everything shown in the app comes from the database. Tunable numbers (campus, HTE
+  version, 22 days/month, 8 hours/day, 600 default hours, 14-day re-check, HTE list public switch)
+  live in the single `app_config` row. Admins are rows in `admins`, added once in the SQL editor.
 - Next 16 runs with `cacheComponents: true`: anything that reads cookies or `searchParams` goes inside
   `<Suspense>`. Next's own docs ship in `node_modules/next/dist/docs/` (see AGENTS.md).
 
@@ -24,8 +33,8 @@ This repo is public, so anything committed is published.
 - Raw source CSVs stay outside the repo (`D:\Downloads\Intern`). Phase 1 writes **scrubbed** copies
   to `supabase/seed/`: no `fit_note` column, no application status, no personal recruiter names,
   phones or private addresses.
-- The NU Laguna HTE list is a school document. Keep it in `private/` and import it locally until the
-  FIC says it can be public. Same for the school Drive links.
+- The NU Laguna HTE list and school Drive links: owner confirmed on 2026-10-23 that the FIC allows
+  them to be public. `app_config.hte_list_public` can hide the list again without a code change.
 - The owner's own tracker rows load through a gitignored script in `private/`, never committed SQL.
 - Test data in the repo uses an obviously fake student.
 

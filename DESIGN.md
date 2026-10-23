@@ -1,7 +1,16 @@
 # OJT Hunter: Design
 
-Status: **direction pending**. Chosen at the start of Phase 2 (directory screens), using the
+Status: **owner brief set 2026-10-23; tokens and components defined at the start of P2** using the
 `frontend-design` skill for app screens. One direction for the whole project.
+
+## Owner brief (2026-10-23)
+- Creative minimalist. Very little text on every screen: one headline, short labels, details on tap.
+- Subtle 3D and depth, used sparingly (one signature element per page, not on every card).
+- Minimal "liquid glass" in the macOS style: translucent surfaces, soft blur, gentle highlights.
+  Keep text contrast measurable; glass never sits behind long text.
+- Use maintained component sources instead of hand-built widgets (Lucide icons, shadcn-style
+  primitives, Sonner toasts, Motion for transitions), restyled to the project tokens.
+- Nothing hardcoded: every listing, label list and number comes from the database or `app_config`.
 
 ## Fixed constraints (from spec section 8)
 - Mobile first, 375px phones opened from Messenger. Compact cards; sticky filter button that opens a
