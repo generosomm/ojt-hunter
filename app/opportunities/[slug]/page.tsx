@@ -11,7 +11,7 @@ import { SaveRoleButton } from "@/components/save-role-button";
 import { StillOpen } from "@/components/still-open";
 import { getSavedOpportunityIds } from "@/lib/me";
 import { getConfig, getJobBoards, getOpportunity, getViewer } from "@/lib/data";
-import { allowanceHeadline, boardSearchUrl, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
+import { allowanceHeadline, boardSearchUrl, boardSearchWords, checkedAgo, dateText, fitsHours, hoursText } from "@/lib/format";
 import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
 
 export async function generateMetadata({ params }: PageProps<"/opportunities/[slug]">): Promise<Metadata> {
@@ -123,7 +123,7 @@ async function Opportunity({ params }: Pick<PageProps<"/opportunities/[slug]">, 
             {boards.map((b) => (
               <a
                 key={b.name}
-                href={boardSearchUrl(b.search_url, `${opp.company_name} intern`)}
+                href={boardSearchUrl(b.search_url, boardSearchWords(opp.company_name))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass flex h-8 items-center gap-1 rounded-full px-3 text-xs font-medium hover:bg-white/50"

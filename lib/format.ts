@@ -48,3 +48,11 @@ export function dateText(d: string | null, timeZone: string) {
 export function boardSearchUrl(template: string, q: string) {
   return template.replaceAll("{q}", encodeURIComponent(q.trim()));
 }
+
+// boards match short names better: "Sun Life Global Solutions Philippines, Inc." searches as "Sun Life Global Solutions intern"
+const SUFFIX = /\b(philippines|phils?|inc|incorporated|corp|corporation|co|ltd|limited|llc|opc)\b\.?/gi;
+
+export function boardSearchWords(company: string) {
+  const name = company.replace(SUFFIX, "").replace(/[(),]/g, " ").replace(/\s+/g, " ").trim();
+  return `${name || company} intern`;
+}
