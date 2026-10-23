@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { IdCardHero } from "@/components/id-card-hero";
@@ -15,6 +16,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <Suspense fallback={<ListSkeleton />}>
         <Directory searchParams={searchParams} />
       </Suspense>
+      <footer className="mt-10 flex justify-center gap-4 text-xs text-ink-soft">
+        <Link href="/privacy" className="underline-offset-4 hover:underline">Privacy</Link>
+        <a href="https://github.com/generosomm/ojt-hunter" target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">Source code</a>
+      </footer>
     </main>
   );
 }

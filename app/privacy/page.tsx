@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy | OJT Hunter",
+  title: "Privacy",
   description: "What OJT Hunter stores when you sign in, and who can see it.",
 };
 
 // Keep this page in sync with what the app actually stores.
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-16 leading-7">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pb-28 pt-10 leading-7">
       <h1 className="text-3xl font-semibold tracking-tight">Privacy</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">Last updated October 23, 2026</p>
+      <p className="text-ink-soft">Last updated October 23, 2026 (analytics added)</p>
 
       <p>
         OJT Hunter is a student project that helps NU Laguna students find OJT openings. You can
@@ -25,8 +25,12 @@ export default function PrivacyPage() {
           Google for basic profile access. We never see your Google password, Gmail or Drive.
         </p>
         <p>
-          Later features will let you save a private application tracker, profile and checklist.
-          Those are only visible to you. Public pages never show who applied where.
+          Your profile, application tracker and deployment checklist are private. Only you can see them,
+          admins included. Public pages never show who applied where.
+        </p>
+        <p>
+          When you share an update or answer &ldquo;Still open?&rdquo;, admins see what you sent so they can
+          review it. Other students only see the result and the date, never your name.
         </p>
       </section>
 
@@ -36,6 +40,11 @@ export default function PrivacyPage() {
           Accounts and data are stored with Supabase. The site is hosted on Vercel. We do not sell
           data, show ads or share it with employers.
         </p>
+        <p>
+          Vercel Web Analytics counts page visits without cookies and without identifying you, so we can
+          see which pages are useful. It never records what you type or your tracker.
+        </p>
+        <p>Your browser keeps a sign-in cookie so you stay logged in. Nothing else is stored for tracking.</p>
       </section>
 
       <section className="flex flex-col gap-2">

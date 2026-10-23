@@ -66,13 +66,14 @@ export function TrackerCard({ app, today }: Props) {
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
+        {/* phones: the controls take the full row (dropdown stretches, icons at the right edge) */}
+        <div className="flex w-full items-center gap-1.5 sm:w-auto sm:shrink-0">
           <label className="sr-only" htmlFor={`status-${app.id}`}>Status</label>
           <select
             id={`status-${app.id}`}
             value={status}
             onChange={(ev) => changeStatus(ev.target.value as ApplicationStatus)}
-            className="glass h-9 w-32 rounded-full px-3 text-sm"
+            className="glass h-9 min-w-0 flex-1 rounded-full px-3 text-sm sm:w-32 sm:flex-none"
           >
             {APPLICATION_STATUSES.map((s) => (
               <option key={s} value={s}>{statusLabel[s]}</option>
