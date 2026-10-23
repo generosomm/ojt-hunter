@@ -13,8 +13,10 @@ set local request.jwt.claims = '{"sub":"aaaaaaaa-0000-0000-0000-00000000000a","r
 do $$ declare n int; begin
   -- save a role twice: second insert must not create a duplicate
   insert into public.applications (user_id, opportunity_id) select 'aaaaaaaa-0000-0000-0000-00000000000a', id from t_opp;
-  insert into public.applications (user_id, opportunity_id) select 'aaaaaaaa-0000-0000-0000-00000000000a', id from t_opp on conflict do nothing;
+  insert into public.applications (user_id, opportunity_id) select 'aaaaaaaa-0000-0000-0000-00000000000a', id from t_opp on conflict (user_id, opportunity_id) do nothing; -- same statement the app's upsert sends
   if (select count(*) from public.applications) <> 1 then raise exception 'FAIL: duplicate card or sees others'; end if;
+  insert into public.applications (user_id, company_name_manual) values ('aaaaaaaa-0000-0000-0000-00000000000a', 'Manual 1'), ('aaaaaaaa-0000-0000-0000-00000000000a', 'Manual 2');
+  if (select count(*) from public.applications) <> 3 then raise exception 'FAIL: manual entries blocked by the unique rule'; end if;
 
   begin
     insert into public.applications (user_id, company_name_manual) values ('bbbbbbbb-0000-0000-0000-00000000000b', 'sneaky');
