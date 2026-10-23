@@ -20,6 +20,13 @@ function useUrlFilters(initial: Filters) {
   const [f, setF] = useState(initial);
   const [pending, start] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // back/forward or a shared link changed the URL from outside: take its filters
+  const incoming = toSearch(initial);
+  const [prevIncoming, setPrevIncoming] = useState(incoming);
+  if (incoming !== prevIncoming) {
+    setPrevIncoming(incoming);
+    if (incoming !== toSearch(f)) setF(initial);
+  }
 
   const update = (next: Filters, delay = 0) => {
     setF(next);
@@ -151,7 +158,7 @@ export function DirectoryFilters({ initial, cities, requiredHours, maxHours }: P
             type="search"
             placeholder="Company or role"
             aria-label="Search company or role"
-            defaultValue={f.q}
+            value={f.q}
             onChange={(e) => update({ ...f, q: e.target.value }, 350)}
             className="w-full min-w-0 bg-transparent text-base outline-none placeholder:text-ink-soft"
           />

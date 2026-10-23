@@ -21,9 +21,10 @@ export function OpportunityCard({ item, timeZone, requiredHours, maxHours }: Pro
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm text-ink-soft">{item.company_name}</p>
-          <h3 className="mt-0.5 line-clamp-2 font-semibold leading-snug">{item.title}</h3>
+          <h2 className="mt-0.5 line-clamp-2 font-semibold leading-snug">{item.title}</h2>
         </div>
         {!item.is_published && <Badge tone="warn">Draft</Badge>}
+        {item.setup === "remote" && <Badge tone="bad">Remote: not allowed for NU Laguna OJT</Badge>}
       </div>
 
       <p className="tabular">

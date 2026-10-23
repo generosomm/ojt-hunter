@@ -22,6 +22,12 @@ Phases 2 and 3 are already public and shareable once deployed.
 - Use `D:\Downloads\Intern\03_OJT_CONTEXT_AND_LESSONS.md` (root copy). The copy inside
   `OJT Hunter Website\` is older and missing the contacts table, bounces and the NU Manila point.
 
+## Carry-over for later phases
+- P3: KPMG has no role, so the role publish switch never shows it. The MOA board needs a company-level publish.
+- P4: the owner's profile hours are empty, so "fits my hours" uses the 600-hour default (Annex at 800 shows as outside). The profile page fixes it.
+- P6 (before writing them): `opportunity_listing` (via `o.*`) and `moa_requests` expose `created_by` and `last_checked_by` to the public API. Drop them from the view or use column grants so classmates' ids are never public.
+- P7: not-found pages return status 200 with `noindex` while streaming; a true 404 needs a Proxy check.
+
 ## Current handoff
 P2 is built and deployed. All 44 roles are drafts: the owner signs in on the live site, reviews them
 (admins see drafts) and publishes. Then real-phone check and P3. Open P0 item: a classmate confirms sign-in.
