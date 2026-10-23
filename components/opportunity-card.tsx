@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { BadgeCheck, Clock, MapPin } from "lucide-react";
+import { BadgeCheck, BookmarkCheck, CircleCheck, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { allowanceHeadline, checkedAgo, fitsHours, hoursText, postedAgo } from "@/lib/format";
 import { devLabel, devTone, partnerLabel, partnerTone, postLabel, postTone, setupLabel } from "@/lib/labels";
+import type { ApplicationStatus } from "@/lib/schemas";
+import { statusLabel } from "@/lib/tracker";
 import type { Listing } from "@/lib/types";
 
-type Props = { item: Listing; timeZone: string; requiredHours: number; maxHours: number };
+type Props = { item: Listing; timeZone: string; requiredHours: number; maxHours: number; tracked?: ApplicationStatus };
 
-export function OpportunityCard({ item, timeZone, requiredHours, maxHours }: Props) {
+export function OpportunityCard({ item, timeZone, requiredHours, maxHours, tracked }: Props) {
   const pay = allowanceHeadline(item);
   const hours = hoursText(item.required_hours_min, item.required_hours_max);
   const fits = fitsHours(item.required_hours_min, item.required_hours_max, requiredHours, maxHours);
@@ -25,6 +27,16 @@ export function OpportunityCard({ item, timeZone, requiredHours, maxHours }: Pro
         </div>
         {!item.is_published && <Badge tone="warn">Draft</Badge>}
         {item.setup === "remote" && <Badge tone="bad">Remote: not allowed for NU Laguna OJT</Badge>}
+        {/* already in your tracker: no need to open it again to check */}
+        {tracked && (
+          <span
+            title={`In your tracker: ${statusLabel[tracked]}`}
+            className="flex shrink-0 items-center gap-1 rounded-full bg-nu-gold/20 px-2 py-1 text-xs font-medium text-ink dark:text-nu-gold"
+          >
+            {tracked === "saved" ? <BookmarkCheck className="size-3.5" /> : <CircleCheck className="size-3.5" />}
+            {statusLabel[tracked]}
+          </span>
+        )}
       </div>
 
       <p className="tabular">

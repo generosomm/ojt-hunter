@@ -98,6 +98,14 @@ export async function getSavedOpportunityIds(): Promise<Set<string>> {
   return new Set((data ?? []).map((r) => r.opportunity_id as string));
 }
 
+// role id -> tracker status, so directory cards can show "Saved" or "Applied" without opening the role
+async function loadTrackedStatuses(): Promise<Map<string, ApplicationStatus>> {
+  const { supabase, userId } = await currentUser();
+  if (!userId) return new Map();
+  const { data } = await supabase.from("applications").select("opportunity_id, status").not("opportunity_id", "is", null);
+  return new Map((data ?? []).map((r) => [r.opportunity_id as string, r.status as ApplicationStatus]));
+}
+
 export function todayIn(timeZone: string) {
   // en-CA formats as YYYY-MM-DD
   return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
@@ -106,3 +114,4 @@ export function todayIn(timeZone: string) {
 // one auth check and one profile read per request, however many components ask
 export const currentUser = cache(loadCurrentUser);
 export const getProfile = cache(loadProfile);
+export const getTrackedStatuses = cache(loadTrackedStatuses);

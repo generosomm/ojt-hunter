@@ -6,6 +6,7 @@ import { DirectoryFilters } from "@/components/filters";
 import { OpportunityCard } from "@/components/opportunity-card";
 import { getConfig, getDirectoryStats, getListings, getViewer } from "@/lib/data";
 import { cityOptions, parseFilters } from "@/lib/filters";
+import { getTrackedStatuses } from "@/lib/me";
 
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
@@ -46,7 +47,7 @@ async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">)
   const filters = parseFilters(await searchParams);
   const config = await getConfig();
   const viewer = await getViewer(config);
-  const [items, stats] = await Promise.all([getListings(filters, viewer), getDirectoryStats()]);
+  const [items, stats, tracked] = await Promise.all([getListings(filters, viewer), getDirectoryStats(), getTrackedStatuses()]);
 
   return (
     <section aria-label="OJT openings" className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-6">
@@ -69,7 +70,7 @@ async function Directory({ searchParams }: Pick<PageProps<"/">, "searchParams">)
         ) : (
           <div className="grid gap-3 xl:grid-cols-2">
             {items.map((item) => (
-              <OpportunityCard key={item.id} item={item} timeZone={config.timezone} requiredHours={viewer.requiredHours} maxHours={viewer.maxHours} />
+              <OpportunityCard key={item.id} item={item} timeZone={config.timezone} requiredHours={viewer.requiredHours} maxHours={viewer.maxHours} tracked={tracked.get(item.id)} />
             ))}
           </div>
         )}
