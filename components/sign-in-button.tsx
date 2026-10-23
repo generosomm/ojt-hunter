@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export function SignInButton({ compact = false }: { compact?: boolean }) {
   const [loading, setLoading] = useState(false);
 
   async function signIn() {
     setLoading(true);
+    // loaded on click: most visitors never sign in, so the auth library stays out of the first page load
+    const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",

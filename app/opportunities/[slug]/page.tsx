@@ -17,7 +17,9 @@ import { applyLabel, devLabel, devTone, novLabel, partnerLabel, partnerTone, pos
 export async function generateMetadata({ params }: PageProps<"/opportunities/[slug]">): Promise<Metadata> {
   await connection();
   const data = await getOpportunity((await params).slug);
-  return data ? { title: `${data.opp.title} at ${data.opp.company_name}` } : { title: "Role not found" };
+  return data
+    ? { title: `${data.opp.title} at ${data.opp.company_name}`, description: `OJT at ${data.opp.company_name}${data.opp.city ? ` in ${data.opp.city}` : ""}: pay, HTE status and how to apply.` }
+    : { title: "Role not found" };
 }
 
 export default function OpportunityPage({ params }: PageProps<"/opportunities/[slug]">) {

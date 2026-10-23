@@ -1,7 +1,9 @@
 "use client";
 
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import { LazyMotion, m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import type { PointerEvent } from "react";
+
+const features = () => import("@/lib/motion-features").then((mod) => mod.default);
 
 type Props = { live: number; partners: number; campus: string };
 
@@ -29,10 +31,11 @@ export function IdCardHero({ live, partners, campus }: Props) {
   }
 
   return (
+    <LazyMotion features={features} strict>
     <div className="relative mx-auto w-full max-w-[340px] sm:w-[340px] [perspective:900px]" onPointerMove={move} onPointerLeave={leave}>
       {/* lanyard */}
       <div aria-hidden className="mx-auto h-10 w-8 rounded-b-md bg-gradient-to-b from-nu-blue/0 to-nu-blue/70" />
-      <motion.div
+      <m.div
         style={reduce ? undefined : { rotateX, rotateY }}
         // no opacity in the entrance: the card must be visible in the server HTML before JS loads
         initial={reduce ? false : { y: -18, rotateZ: -5 }}
@@ -41,7 +44,7 @@ export function IdCardHero({ live, partners, campus }: Props) {
         className="glass-strong relative aspect-[1.58/1] w-full overflow-hidden rounded-[26px] p-5"
       >
         <span aria-hidden className="absolute left-1/2 top-3 h-1.5 w-12 -translate-x-1/2 rounded-full bg-ink/15" />
-        {!reduce && <motion.div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: shine }} />}
+        {!reduce && <m.div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: shine }} />}
         <div className="relative flex h-full flex-col justify-between">
           <div className="flex items-center justify-between pt-2">
             <span className="text-sm font-medium text-ink-soft">{campus} intern</span>
@@ -58,7 +61,8 @@ export function IdCardHero({ live, partners, campus }: Props) {
             </p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
+    </LazyMotion>
   );
 }
